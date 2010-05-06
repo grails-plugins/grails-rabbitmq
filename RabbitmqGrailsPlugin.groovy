@@ -48,8 +48,6 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                     connectionFactory = rabbitMQConnectionFactory
                     queueName = rabbitQueue
                     concurrentConsumers = 5
-                    def adapter = new MessageListenerAdapter()
-                    messageListener = adapter
                 }
             }
         }
@@ -60,8 +58,10 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
         containerBeans.each { beanName, bean ->
             if(beanName.endsWith(LISTENER_CONTAINER_SUFFIX)) {
+                def adapter = new MessageListenerAdapter()
                 def serviceName = beanName - LISTENER_CONTAINER_SUFFIX
-                bean.messageListener.delegate = applicationContext.getBean(serviceName)
+                adapter.delegate = applicationContext.getBean(serviceName)
+                bean.messageListener = adapter
             }
         }
     }
