@@ -1,7 +1,8 @@
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 
 class RabbitmqGrailsPlugin {
     // the plugin version
@@ -14,6 +15,7 @@ class RabbitmqGrailsPlugin {
     def pluginExcludes = [
             "grails-app/views/error.gsp",
             "grails-app/services/*",
+            "grails-app/controllers/*",
             "**/.gitignore"
     ]
 
@@ -29,6 +31,7 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
     def documentation = "http://grails.org/plugin/rabbitmq"
     
     def loadAfter = ['services']
+    def observe = ['*']
 
     private static LISTENER_CONTAINER_SUFFIX = '_MessageListenerContainer'
 
@@ -37,6 +40,9 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
             username = 'guest'
             password = 'guest'
             channelCacheSize = 10
+        }
+        rabbitTemplate(RabbitTemplate) {
+            connectionFactory = rabbitMQConnectionFactory
         }
         application.serviceClasses.each { service ->
             def serviceClass = service.getClazz()
@@ -53,6 +59,27 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         }
         
     }
+    
+    def doWithDynamicMethods = { appCtx ->
+        addDynamicMessageSendingMessages application.allClasses, appCtx
+    }
+    
+    private addDynamicMessageSendingMessages(classes, ctx) {
+        classes.each { clz ->
+            clz.metaClass.rabbitSend = { Object[] args ->
+                def connection = ctx.rabbitMQConnectionFactory.createConnection();
+                def channel = connection.createChannel();
+                channel.queueDeclare(args[-2]);
+                channel.close();
+                connection.close();
+
+                if(args[-1] instanceof GString) { 
+                    args[-1] = args[-1].toString()
+                }
+                ctx.rabbitTemplate.convertAndSend(*args)
+            }
+        }
+    }
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
@@ -63,6 +90,12 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 adapter.delegate = applicationContext.getBean(serviceName)
                 bean.messageListener = adapter
             }
+        }
+    }
+    
+    def onChange = { evt ->
+        if(evt.source instanceof Class) {
+            addDynamicMessageSendingMessages ([evt.source], evt.ctx)
         }
     }
 }
