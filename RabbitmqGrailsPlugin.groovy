@@ -20,7 +20,6 @@ class RabbitmqGrailsPlugin {
             "**/.gitignore"
     ]
 
-    // TODO Fill in these fields
     def author = "Jeff Brown"
     def authorEmail = "jeff.brown@springsource.com"
     def title = "Rabbit MQ"
