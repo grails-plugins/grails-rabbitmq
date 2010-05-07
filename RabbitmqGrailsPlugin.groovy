@@ -22,7 +22,7 @@ class RabbitmqGrailsPlugin {
 
     // TODO Fill in these fields
     def author = "Jeff Brown"
-    def authorEmail = ""
+    def authorEmail = "jeff.brown@springsource.com"
     def title = "Rabbit MQ"
     def description = '''\\
 The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
