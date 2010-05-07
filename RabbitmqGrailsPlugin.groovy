@@ -16,6 +16,7 @@ class RabbitmqGrailsPlugin {
             "grails-app/views/error.gsp",
             "grails-app/services/*",
             "grails-app/controllers/*",
+            "grails-app/conf/Config.groovy",
             "**/.gitignore"
     ]
 
@@ -35,29 +36,39 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
 
     private static LISTENER_CONTAINER_SUFFIX = '_MessageListenerContainer'
 
-    def doWithSpring = {
-        rabbitMQConnectionFactory(CachingConnectionFactory, 'localhost') {
-            username = 'guest'
-            password = 'guest'
-            channelCacheSize = 10
-        }
-        rabbitTemplate(RabbitTemplate) {
-            connectionFactory = rabbitMQConnectionFactory
-        }
-        application.serviceClasses.each { service ->
-            def serviceClass = service.getClazz()
-            def propertyName = service.propertyName
-
-            def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
-            if(rabbitQueue) { 
-                "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
-                    connectionFactory = rabbitMQConnectionFactory
-                    queueName = rabbitQueue
-                    concurrentConsumers = 5
+    def doWithSpring = { 
+        
+        def connectionFactoryConfig = application.config.rabbitmq?.connectionfactory
+        
+        def connectionFactoryUsername = connectionFactoryConfig?.username
+        def connectionFactoryPassword = connectionFactoryConfig?.password
+        def connectionFactoryHostname = connectionFactoryConfig?.hostname
+        
+        if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
+            log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
+        } else {
+            rabbitMQConnectionFactory(CachingConnectionFactory, connectionFactoryHostname) {
+                username = connectionFactoryUsername
+                password = connectionFactoryPassword
+                channelCacheSize = 10
+            }
+            rabbitTemplate(RabbitTemplate) {
+                connectionFactory = rabbitMQConnectionFactory
+            }
+            application.serviceClasses.each { service ->
+                def serviceClass = service.getClazz()
+                def propertyName = service.propertyName
+        
+                def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
+                if(rabbitQueue) { 
+                    "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
+                        connectionFactory = rabbitMQConnectionFactory
+                        queueName = rabbitQueue
+                        concurrentConsumers = 5
+                    }
                 }
             }
-        }
-        
+        }   
     }
     
     def doWithDynamicMethods = { appCtx ->
@@ -65,18 +76,20 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
     }
     
     private addDynamicMessageSendingMessages(classes, ctx) {
-        classes.each { clz ->
-            clz.metaClass.rabbitSend = { Object[] args ->
-                def connection = ctx.rabbitMQConnectionFactory.createConnection();
-                def channel = connection.createChannel();
-                channel.queueDeclare(args[-2]);
-                channel.close();
-                connection.close();
+        if(ctx.rabbitMQConnectionFactory) {
+            classes.each { clz ->
+                clz.metaClass.rabbitSend = { Object[] args ->
+                    def connection = ctx.rabbitMQConnectionFactory.createConnection();
+                    def channel = connection.createChannel();
+                    channel.queueDeclare(args[-2]);
+                    channel.close();
+                    connection.close();
 
-                if(args[-1] instanceof GString) { 
-                    args[-1] = args[-1].toString()
+                    if(args[-1] instanceof GString) { 
+                        args[-1] = args[-1].toString()
+                    }
+                    ctx.rabbitTemplate.convertAndSend(*args)
                 }
-                ctx.rabbitTemplate.convertAndSend(*args)
             }
         }
     }
