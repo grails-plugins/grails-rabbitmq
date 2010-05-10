@@ -16,6 +16,7 @@ class RabbitmqGrailsPlugin {
             "grails-app/views/error.gsp",
             "grails-app/services/*",
             "grails-app/controllers/*",
+            "grails-app/views/message/*",
             "grails-app/conf/Config.groovy",
             "**/.gitignore"
     ]
