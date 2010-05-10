@@ -55,7 +55,7 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 connectionFactory = rabbitMQConnectionFactory
             }
             application.serviceClasses.each { service ->
-                def serviceClass = service.getClazz()
+                def serviceClass = service.clazz
                 def propertyName = service.propertyName
         
                 def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
@@ -78,11 +78,11 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         if(ctx.rabbitMQConnectionFactory) {
             classes.each { clz ->
                 clz.metaClass.rabbitSend = { Object[] args ->
-                    def connection = ctx.rabbitMQConnectionFactory.createConnection();
-                    def channel = connection.createChannel();
-                    channel.queueDeclare(args[-2]);
-                    channel.close();
-                    connection.close();
+                    def connection = ctx.rabbitMQConnectionFactory.createConnection()
+                    def channel = connection.createChannel()
+                    channel.queueDeclare(args[-2])
+                    channel.close()
+                    connection.close()
 
                     if(args[-1] instanceof GString) { 
                         args[-1] = args[-1].toString()
