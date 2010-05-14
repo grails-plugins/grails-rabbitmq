@@ -1,3 +1,5 @@
+package org.grails.rabbitmq.test
+
 class DemoService {
     static rabbitQueue = 'foo'
 

@@ -5,3 +5,9 @@ rabbitmq {
         hostname = 'localhost'
     }
 }
+
+environments {
+    test {
+        rabbitmq.connectionfactory.className = 'org.grails.rabbitmq.test.DummyConnectionFactory'
+    }
+}

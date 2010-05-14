@@ -14,10 +14,11 @@ class RabbitmqGrailsPlugin {
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp",
-            "grails-app/services/*",
-            "grails-app/controllers/*",
+            "grails-app/services/**",
+            "grails-app/controllers/**",
             "grails-app/views/message/*",
             "grails-app/conf/Config.groovy",
+            "src/groovy/org/grails/rabbitmq/test/**",
             "**/.gitignore"
     ]
 
@@ -47,7 +48,11 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
             log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
         } else {
-            rabbitMQConnectionFactory(CachingConnectionFactory, connectionFactoryHostname) {
+            def connectionFactoryClassName = connectionFactoryConfig?.className ?: 'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
+            def parentClassLoader = getClass().classLoader
+            def loader = new GroovyClassLoader(parentClassLoader)
+            def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
+            rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
                 channelCacheSize = 10

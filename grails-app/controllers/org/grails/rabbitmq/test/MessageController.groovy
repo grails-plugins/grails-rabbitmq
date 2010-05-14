@@ -1,3 +1,5 @@
+package org.grails.rabbitmq.test
+
 class MessageController {
     
     def index = {}
