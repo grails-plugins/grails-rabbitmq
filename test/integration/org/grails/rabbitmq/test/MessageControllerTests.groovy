@@ -8,21 +8,33 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 class MessageControllerTests extends ControllerUnitTestCase {
     
     void testRabbitSendCallsConvertAndSend() {
-        def queueName
-        def messageSent
+        def stringMessageQueueName
+        def stringMessage
+        
+        def mapMessageQueueName
+        def mapMessage
         
         mockParams.msg = 'Hello World'
         
         def mockTemplate = new MockFor(RabbitTemplate)
         mockTemplate.demand.convertAndSend { String queue, String message ->
-            queueName = queue
-            messageSent = message
+            stringMessageQueueName = queue
+            stringMessage = message
+        }
+        mockTemplate.demand.convertAndSend { String queue, Map message ->
+            mapMessage = message
+            mapMessageQueueName = queue
         }
         mockTemplate.use {
             controller.sendMessage()
         }
         
-        assertEquals 'Message: Hello World', messageSent
-        assertEquals 'foo', queueName
+        assertEquals 'Message: Hello World', stringMessage
+        assertEquals 'foo', stringMessageQueueName
+        
+        assertEquals 'foo', mapMessageQueueName
+        assertEquals 2, mapMessage?.size()
+        assertEquals 'Hello World', mapMessage.msgBody
+        assertTrue mapMessage.msgTime instanceof Date
     }
 }

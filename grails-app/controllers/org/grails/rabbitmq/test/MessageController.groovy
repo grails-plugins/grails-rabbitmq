@@ -9,6 +9,10 @@ class MessageController {
         
         rabbitSend 'foo', "Message: ${msg}"
         
+        def messageMap = [msgBody: msg, msgTime: new Date()]
+        
+        rabbitSend 'foo', messageMap
+        
         redirect action: index
     }
 }
