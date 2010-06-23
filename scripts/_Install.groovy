@@ -23,6 +23,7 @@ rabbitmq {
         username = 'guest'
         password = 'guest'
         hostname = 'localhost'
+        consumers = 5
     }
 }
 

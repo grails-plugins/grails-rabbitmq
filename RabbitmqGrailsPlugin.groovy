@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.101"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3 > *"
     // the other plugins this plugin depends on
@@ -44,10 +44,14 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         def connectionFactoryUsername = connectionFactoryConfig?.username
         def connectionFactoryPassword = connectionFactoryConfig?.password
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
+        def connectionFactoryConsumers = connectionFactoryConfig?.consumers 
         
-        if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
-            log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
+        if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname || !connectionFactoryConsumers) {
+            log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password, rabbitmq.connectionfactory.hostname and rabbitmq.connectionfactory.consumers) must be defined in Config.groovy'
         } else {
+          
+            log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${connectionFactoryConsumers} consumers."
+          
             def connectionFactoryClassName = connectionFactoryConfig?.className ?: 'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
@@ -60,16 +64,19 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
             }
+            
             application.serviceClasses.each { service ->
+                
                 def serviceClass = service.clazz
                 def propertyName = service.propertyName
         
                 def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
+                
                 if(rabbitQueue) { 
                     "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
                         connectionFactory = rabbitMQConnectionFactory
                         queueName = rabbitQueue
-                        concurrentConsumers = 5
+                        concurrentConsumers = connectionFactoryConsumers
                     }
                 }
             }
