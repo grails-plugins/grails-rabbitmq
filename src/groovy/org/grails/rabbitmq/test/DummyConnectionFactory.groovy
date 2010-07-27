@@ -12,8 +12,11 @@ class DummyConnectionFactory implements ConnectionFactory {
     DummyConnectionFactory(String hostName) {}
 
     Connection createConnection() {
-        def mockChannel = [close:{->},basicConsume:{Object[] args->},basicQos:{Object[] args->},queueDeclare:{Object[] args->}] as Channel
-        def mockConnection = [close:{->},createChannel:{-> mockChannel}] as Connection
+        def mockChannel = [basicConsume: {Object[] args ->}, queueDeclarePassive: {}, queueDeclare: { Object[] args ->}, basicQos: { Object[] args ->}] as Channel
+        def mockConnection = [createChannel: {-> mockChannel}] as Connection
         mockConnection
     }
+
+    String getVirtualHost(){}
+    String getHost(){}
 }
