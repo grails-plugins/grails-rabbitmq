@@ -46,7 +46,8 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         def connectionFactoryUsername = connectionFactoryConfig?.username
         def connectionFactoryPassword = connectionFactoryConfig?.password
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
-        def connectionFactoryConsumers = connectionFactoryConfig?.consumers ?: 5
+        def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
+        def connectionFactoryConsumers = application.config.rabbitmq?.concurrentConsumers ?: 1
         
         if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
             log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
@@ -61,7 +62,7 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
             rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
-                channelCacheSize = 10
+                channelCacheSize = connectionChannelCacheSize
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
