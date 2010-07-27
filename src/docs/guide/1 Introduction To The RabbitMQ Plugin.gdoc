@@ -1,4 +1,6 @@
-The RabbitMQ plugin provides integration with the RabbitMQ highly reliable enterprise messaging system.
+The RabbitMQ plugin provides integration with the RabbitMQ highly reliable enterprise messaging system.  The
+plugin relies on [Spring AMQP|http://www.springsource.org/spring-amqp] as an implementation detail, which provides a high level abstraction
+for sending and receiving messages.
 
 This guide documents configuration details and usage details for the plugin.  More information on
 RabbitMQ itself is available at [rabbitmq.com|http://www.rabbitmq.com/].
