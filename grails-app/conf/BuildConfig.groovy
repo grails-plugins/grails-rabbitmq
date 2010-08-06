@@ -32,7 +32,8 @@ grails.project.dependency.resolution = {
                      'spring-aop',
                      'spring-oxm',
                      'spring-test',
-                     'spring-tx'
+                     'spring-tx',
+                     'slf4j-log4j12'
         }
     }
 
