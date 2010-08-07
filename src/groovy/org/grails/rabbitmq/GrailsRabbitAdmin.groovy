@@ -35,7 +35,6 @@ class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, Applicati
             declareQueue(queue)
         }
         running = true
-        super.start()
     }
 
     void stop() {
