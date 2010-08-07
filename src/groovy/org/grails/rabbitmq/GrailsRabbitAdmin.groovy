@@ -13,7 +13,7 @@ class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, Applicati
     private boolean running
 
     GrailsRabbitAdmin(ConnectionFactory connectionFactory) {
-        super connectionFactory
+        super(connectionFactory)
     }
 
     boolean isAutoStartup() {
