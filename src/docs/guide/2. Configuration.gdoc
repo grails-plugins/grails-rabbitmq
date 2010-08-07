@@ -15,7 +15,7 @@ rabbitmq {
 Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a
 RabbitMQ server.
 
-Following is a list of all of the configuration settings supported by the plugin.
+Following is a list of other configuration settings supported by the plugin.
 
 {table}
 *Configuration Property* | *Description* | *Default* 
