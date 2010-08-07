@@ -17,12 +17,10 @@ class MessageControllerTests extends ControllerUnitTestCase {
         mockParams.msg = 'Hello World'
         
         def mockTemplate = new MockFor(RabbitTemplate)
-        mockTemplate.demand.execute{}
         mockTemplate.demand.convertAndSend { String queue, String message ->
             stringMessageQueueName = queue
             stringMessage = message
         }
-        mockTemplate.demand.execute{}
         mockTemplate.demand.convertAndSend { String queue, Map message ->
             mapMessage = message
             mapMessageQueueName = queue
