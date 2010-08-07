@@ -13,7 +13,7 @@ class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, Applicati
     private boolean running
 
     GrailsRabbitAdmin(ConnectionFactory connectionFactory) {
-        super(connectionFactory)
+        super connectionFactory
     }
 
     boolean isAutoStartup() {
@@ -32,7 +32,7 @@ class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, Applicati
     void start() {
         def queues = applicationContext.getBeansOfType(Queue)?.values()
         queues?.each { queue ->
-            declareQueue(queue)
+            declareQueue queue
         }
         running = true
     }
