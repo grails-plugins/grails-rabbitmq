@@ -1,7 +1,6 @@
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
-import org.grails.rabbitmq.GrailsRabbitMessageListenerContainer
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
-import org.springframework.amqp.rabbit.core.ChannelCallback
+import org.grails.rabbitmq.RabbitQueueBuilder
+import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
@@ -67,7 +66,7 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
             }
-            
+            adm(org.grails.rabbitmq.GrailsRabbitAdmin, rabbitMQConnectionFactory)
             application.serviceClasses.each { service ->
                 
                 def serviceClass = service.clazz
@@ -76,10 +75,28 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
                 
                 if(rabbitQueue) { 
-                    "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(GrailsRabbitMessageListenerContainer) {
+                    "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
                         connectionFactory = rabbitMQConnectionFactory
                         queueName = rabbitQueue
                         concurrentConsumers = connectionFactoryConsumers
+                    }
+                }
+            }
+
+            def queuesConfig = application.config.rabbitmq?.queues
+            if(queuesConfig) {
+                def queueBuilder = new RabbitQueueBuilder()
+                queuesConfig.delegate = queueBuilder
+                queuesConfig()
+                def queues = queueBuilder.queues
+                if(queues) {
+                    queues.each { queue ->
+                        "grails.rabbit.queue.${queue.name}"(Queue, queue.name) {
+                            durable = queue.durable
+                            autoDelete = queue.autoDelete
+                            exclusive = queue.exclusive
+                            arguments = queue.arguments
+                        }
                     }
                 }
             }
@@ -94,10 +111,6 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
         if(ctx.rabbitMQConnectionFactory) {
             classes.each { clz ->
                 clz.metaClass.rabbitSend = { Object[] args ->
-                    ctx.rabbitTemplate.execute([doInRabbit: { channel ->
-                        channel.queueDeclare(args[-2], false, false, false, null)
-                    }] as ChannelCallback)
-                    
                     if(args[-1] instanceof GString) { 
                         args[-1] = args[-1].toString()
                     }

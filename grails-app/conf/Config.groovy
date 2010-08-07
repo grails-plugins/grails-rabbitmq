@@ -4,6 +4,10 @@ rabbitmq {
         password = 'guest'
         hostname = 'localhost'
     }
+    concurrentConsumers = 9
+    queues = {
+        foo()
+    }
 }
 
 environments {
