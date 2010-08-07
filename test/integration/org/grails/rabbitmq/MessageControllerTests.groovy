@@ -1,11 +1,15 @@
-package org.grails.rabbitmq.test
+package org.grails.rabbitmq
 
 import grails.test.ControllerUnitTestCase
 import groovy.mock.interceptor.MockFor
+import org.grails.rabbitmq.test.MessageController
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 
-
 class MessageControllerTests extends ControllerUnitTestCase {
+    
+    MessageControllerTests() {
+        super(MessageController)
+    }
     
     void testRabbitSendCallsConvertAndSend() {
         def stringMessageQueueName

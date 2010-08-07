@@ -1,4 +1,4 @@
-package org.grails.rabbitmq.test
+package org.grails.rabbitmq
 
 
 class ConnectionFactoryInitializationTests extends GroovyTestCase {
