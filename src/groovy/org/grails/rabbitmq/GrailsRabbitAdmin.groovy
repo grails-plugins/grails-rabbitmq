@@ -10,7 +10,7 @@ import org.springframework.context.SmartLifecycle
 class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, ApplicationContextAware {
 
     ApplicationContext applicationContext
-    private volatile boolean running
+    private boolean running
 
     GrailsRabbitAdmin(ConnectionFactory connectionFactory) {
         super(connectionFactory)
