@@ -63,7 +63,9 @@ rabbitmq &#123;
         myQueueName()
         myOtherQueueName autoDelete: <span class="java&#45;keyword">false</span>, durable: <span class="java&#45;keyword">true</span>, exclusive: <span class="java&#45;keyword">false</span>, arguments: &#91;arg1: 'val1', arg2: 'val2'&#93;
     &#125;
-&#125;</pre></div><p class="paragraph"/>With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.<h1><a name="3. Sending Messages">3. Sending Messages</a></h1>The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.
+</blockquote><h1><a name="3. Sending Messages">3. Sending Messages</a></h1>The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
 <code>rabbitSend</code> method accepts 2 parameters.  The first parameter is a queue name and the second parameter is the message
 being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
         rabbitSend 'someQueueName', 'someMessage'
