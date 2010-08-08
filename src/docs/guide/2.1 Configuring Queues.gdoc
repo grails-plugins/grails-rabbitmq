@@ -36,4 +36,6 @@ rabbitmq {
 }
 {code}
 
+{note}
 With both techniques, the @autoDelete@, @durable@ and @exclusive@ attributes default to @false@ and the @arguments@ attribute defaults to null.
+{note}
