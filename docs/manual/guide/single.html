@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <title>RabbitMQ Plugin 0.2-SNAPSHOT - Reference Documentation</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Style" charset="utf-8"/>
+        <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    </head>
+    <body class="body">
+        <div id="header">
+            <div class="images"><br/><br/>
+                <a href="http://grails.org" target="_blank"><img alt="The Grails Framework" src="../img/grails.png" border="0"/></a>
+                <span style="right:30px; top:20px; position:absolute;">
+                    <a href="../index.html" target="_top">Frames</a> | <a href="index.html" target="_top">No Frames</a><br/><br/>
+                    <a href="http://springsource.com" target="_blank"><img alt="SpringSource - A Division of VMware" src="../img/springsource-logo.png" border="0"/></a>
+                </span>
+            </div>
+            <div class="message">rabbitmq</div>
+            <h1>RabbitMQ Plugin - Reference Documentation</h1>
+            <p><strong>Authors:</strong> Jeff Brown</p>
+            <p><strong>Version:</strong> 0.2-SNAPSHOT</p>
+            <em></em>
+        </div>
+
+        <div id="toc">
+            <h2>Table of Contents</h2>
+            <div class="tocItem" style="margin-left:0px"><a href="#1. Introduction To The RabbitMQ Plugin">1. Introduction To The RabbitMQ Plugin</a></div><div class="tocItem" style="margin-left:0px"><a href="#2. Configuration">2. Configuration</a></div><div class="tocItem" style="margin-left:10px"><a href="#2.1 Configuring Queues">2.1 Configuring Queues</a></div><div class="tocItem" style="margin-left:0px"><a href="#3. Sending Messages">3. Sending Messages</a></div><div class="tocItem" style="margin-left:0px"><a href="#4. Consuming Messages">4. Consuming Messages</a></div><div class="tocItem" style="margin-left:0px"><a href="#5. Using The RabbitTemplate Directly">5. Using The RabbitTemplate Directly</a></div>
+        </div>
+        <div id="content">
+            <h1><a name="1. Introduction To The RabbitMQ Plugin">1. Introduction To The RabbitMQ Plugin</a></h1>The RabbitMQ plugin provides integration with the RabbitMQ highly reliable enterprise messaging system.  The
+plugin relies on <a href="http://www.springsource.org/spring-amqp" target="blank">Spring AMQP</a> as an implementation detail, which provides a high level abstraction
+for sending and receiving messages.<p class="paragraph"/>This guide documents configuration details and usage details for the plugin.  More information on
+RabbitMQ itself is available at <a href="http://www.rabbitmq.com/" target="blank">rabbitmq.com</a>.<h1><a name="2. Configuration">2. Configuration</a></h1>The plugin supports a number of configuration options which all may be expressed in <code>grails-app/conf/Config.groovy</code>.  A
+basic configuration might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
+rabbitmq &#123;
+    connectionfactory &#123;
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a
+RabbitMQ server.<p class="paragraph"/>Following is a list of other configuration settings supported by the plugin.<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Configuration Property</strong></th><th><strong class="bold">Description</strong></th><th><strong class="bold">Default</strong></th></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.username</td><td>The user name for connection to the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.password</td><td>The password for connection to the server</td><td>(none)</td></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.hostname</td><td>The host name of the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.channelCacheSize</td><td>The connection channel cache size</td><td>10</td></tr><tr class="table-odd"><td>rabbitmq.concurrentConsumers</td><td>The number of concurrent consumers to create per message handler.  Raising the number is recommendable in order to scale the consumption of messages coming in from a queue.  Note that ordering guarantees are lost when multiple consumers are registered.</td><td>1</td></tr></table><h2><a name="2.1 Configuring Queues">2.1 Configuring Queues</a></h2>Queues must be declared in the RabbitMQ server before consumers can be associated with those Queues and before messages
+may be sent to those Queues.  If the Grails application will be sending messages to or receiving messages from Queues 
+that may not already be declared in the RabbitMQ server, the application needs to declare those Queues up front.  One 
+way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>.  That 
+might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/spring/resources.groovy
+beans = &#123;
+    myQueue(org.springframework.amqp.core.Queue, 'myQueueName') 
+    myOtherQueue(org.springframework.amqp.core.Queue, 'myOtherQueueName') &#123;
+        autoDelete = <span class="java&#45;keyword">false</span>
+        durable = <span class="java&#45;keyword">true</span>
+        exclusive = <span class="java&#45;keyword">false</span>
+        arguments = &#91;arg1: 'val1', arg2: 'val2'&#93;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>The plugin also supports a DSL for describing these Queues.  This DSL is expressed in
+<code>grails-app/conf/Config.groovy</code>.  The code below shows how to describe same Queues that
+were described in the previous code sample.<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
+rabbitmq &#123;
+    connectionfactory &#123;
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+    &#125;
+    queues = &#123;
+        myQueueName()
+        myOtherQueueName autoDelete: <span class="java&#45;keyword">false</span>, durable: <span class="java&#45;keyword">true</span>, exclusive: <span class="java&#45;keyword">false</span>, arguments: &#91;arg1: 'val1', arg2: 'val2'&#93;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.<h1><a name="3. Sending Messages">3. Sending Messages</a></h1>The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
+<code>rabbitSend</code> method accepts 2 parameters.  The first parameter is a queue name and the second parameter is the message
+being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
+        rabbitSend 'someQueueName', 'someMessage'
+        &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Messages may also be sent by interacting with the <code>RabbitTemplate</code> Spring bean directly.  See the <a href="../guide/single.html#5. Using The RabbitTemplate Directly" class="guide">Using The RabbitTemplate Directly</a> 
+section for more information.<h1><a name="4. Consuming Messages">4. Consuming Messages</a></h1>The plugin provides a convention based mechanism for associating a listener with a Queue.  Any Grails Service may
+express that it wants to receive messages on a specific Queue by defining a static property named <code>rabbitQueue</code> and
+assigning the property a String which represents the name of a Queue.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(message) &#123;
+        // handle message&#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Messages are delivered to the Service by invoking the <code>handleMessage</code> method.<p class="paragraph"/>Different message types may be handled with overloaded versions of <code>handleMessage</code>.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(<span class="java&#45;object">String</span> textMessage) &#123;
+        // handle <span class="java&#45;object">String</span> message&#8230;
+    &#125;<p class="paragraph"/>    void handleMessage(Map mapMessage) &#123;
+        // handle Map message///
+    &#125;
+&#125;</pre></div><p class="paragraph"/><h1><a name="5. Using The RabbitTemplate Directly">5. Using The RabbitTemplate Directly</a></h1>Most of the interaction with the RabbitMQ server is being handled by an instance of 
+<code>org.springframework.amqp.rabbit.core.RabbitTemplate</code>.  For many applications this is
+happening at a lower level than the application needs to be concerned with.  The plugin
+does provide a Spring bean to the application context that is an instance of the
+<code>RabbitTemplate</code> class which may be used directly.  The bean name is <code>rabbitTemplate</code>.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def rabbitTemplate<p class="paragraph"/>    def sendMessage = &#123;
+        rabbitTemplate.convertAndSend('someQueueName', 'someMessage)
+        &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>The full API of the <code>RabbitTemplate</code> class is documented in 
+<a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/" target="blank">The Spring AMQP API Docs</a>.
+        </div>
+        <div id="footer">
+             
+        </div>
+    </body>
+</html>

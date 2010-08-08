@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>3 Sending Messages</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
+<code>rabbitSend</code> method accepts 2 parameters.  The first parameter is a queue name and the second parameter is the message
+being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
+        rabbitSend 'someQueueName', 'someMessage'
+        &#8230;
+    &#125;
+&#125;</pre></div>
+    </body>
+</html>

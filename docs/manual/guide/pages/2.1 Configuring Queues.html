@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>2.1 Configuring Queues</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    Queues must be declared in the RabbitMQ server before consumers can be associated with those Queues and before messages
+may be sent to those Queues.  If the Grails application will be sending messages to or receiving messages from Queues 
+that may not already be declared in the RabbitMQ server, the application needs to declare those Queues up front.  One 
+way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>.  That 
+might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/spring/resources.groovy
+beans = &#123;
+    myQueue(org.springframework.amqp.core.Queue, 'myQueueName') 
+    myOtherQueue(org.springframework.amqp.core.Queue, 'myOtherQueueName') &#123;
+        autoDelete = <span class="java&#45;keyword">false</span>
+        durable = <span class="java&#45;keyword">true</span>
+        exclusive = <span class="java&#45;keyword">false</span>
+        arguments = &#91;arg1: 'val1', arg2: 'val2'&#93;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>The plugin also supports a DSL for describing these Queues.  This DSL is expressed in
+<code>grails-app/conf/Config.groovy</code>.  The code below shows how to describe same Queues that
+were described in the previous code sample.<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
+rabbitmq &#123;
+    connectionfactory &#123;
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+    &#125;
+    queues = &#123;
+        myQueueName()
+        myOtherQueueName autoDelete: <span class="java&#45;keyword">false</span>, durable: <span class="java&#45;keyword">true</span>, exclusive: <span class="java&#45;keyword">false</span>, arguments: &#91;arg1: 'val1', arg2: 'val2'&#93;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.
+    </body>
+</html>

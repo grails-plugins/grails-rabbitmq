@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>4. Consuming Messages</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    The plugin provides a convention based mechanism for associating a listener with a Queue.  Any Grails Service may
+express that it wants to receive messages on a specific Queue by defining a static property named <code>rabbitQueue</code> and
+assigning the property a String which represents the name of a Queue.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(message) &#123;
+        // handle message&#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>Messages are delivered to the Service by invoking the <code>handleMessage</code> method.<p class="paragraph"/>Different message types may be handled with overloaded versions of <code>handleMessage</code>.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(<span class="java&#45;object">String</span> textMessage) &#123;
+        // handle <span class="java&#45;object">String</span> message&#8230;
+    &#125;<p class="paragraph"/>    void handleMessage(Map mapMessage) &#123;
+        // handle Map message///
+    &#125;
+&#125;</pre></div><p class="paragraph"/>
+    </body>
+</html>
