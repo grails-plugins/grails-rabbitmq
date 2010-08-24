@@ -104,10 +104,10 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
     }
     
     def doWithDynamicMethods = { appCtx ->
-        addDynamicMessageSendingMessages application.allClasses, appCtx
+        addDynamicMessageSendingMethods application.allClasses, appCtx
     }
     
-    private addDynamicMessageSendingMessages(classes, ctx) {
+    private addDynamicMessageSendingMethods(classes, ctx) {
         if(ctx.rabbitMQConnectionFactory) {
             classes.each { clz ->
                 clz.metaClass.rabbitSend = { Object[] args ->
@@ -134,7 +134,7 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
     
     def onChange = { evt ->
         if(evt.source instanceof Class) {
-            addDynamicMessageSendingMessages ([evt.source], evt.ctx)
+            addDynamicMessageSendingMethods ([evt.source], evt.ctx)
         }
     }
 }
