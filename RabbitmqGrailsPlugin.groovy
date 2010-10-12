@@ -7,9 +7,9 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "0.2"
+    def version = "0.3-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3 > *"
+    def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
@@ -27,7 +27,7 @@ class RabbitmqGrailsPlugin {
     def authorEmail = "jeff.brown@springsource.com"
     def title = "Rabbit MQ"
     def description = '''\\
-The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
+The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
 '''
 
     // URL to the plugin's documentation
@@ -76,6 +76,9 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 
                 if(rabbitQueue) { 
                     "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
+                        // We manually start the listener once we have attached the
+                        // service in doWithApplicationContext.
+                        autoStartup = false
                         connectionFactory = rabbitMQConnectionFactory
                         queueName = rabbitQueue
                         concurrentConsumers = connectionFactoryConsumers
@@ -128,6 +131,9 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 def serviceName = beanName - LISTENER_CONTAINER_SUFFIX
                 adapter.delegate = applicationContext.getBean(serviceName)
                 bean.messageListener = adapter
+                
+                // Now that the listener is properly configured, we can start it.
+                bean.start()
             }
         }
     }
