@@ -1,4 +1,5 @@
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
+import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.grails.rabbitmq.RabbitQueueBuilder
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -80,12 +81,30 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                         // service in doWithApplicationContext.
                         autoStartup = false
                         connectionFactory = rabbitMQConnectionFactory
-                        queueName = rabbitQueue
                         concurrentConsumers = connectionFactoryConsumers
+                        queueName = rabbitQueue
+                    }
+                }
+                else {
+                    def rabbitSubscribe = GCU.getStaticPropertyValue(serviceClass, 'rabbitSubscribe')
+                    if (rabbitSubscribe) {
+                        if (!(rabbitSubscribe instanceof CharSequence) && !(rabbitSubscribe instanceof Map)) {
+                            log.error "The 'rabbitSubscribe' property on service ${service.fullName} must be a string or a map"
+                        }
+                        else {
+                            "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(AutoQueueMessageListenerContainer) {
+                                // We manually start the listener once we have attached the
+                                // service in doWithApplicationContext.
+                                autoStartup = false
+                                connectionFactory = rabbitMQConnectionFactory
+                                concurrentConsumers = connectionFactoryConsumers
+                                exchange = rabbitSubscribe
+                            }
+                        }
                     }
                 }
             }
-
+            
             def queuesConfig = application.config.rabbitmq?.queues
             if(queuesConfig) {
                 def queueBuilder = new RabbitQueueBuilder()
