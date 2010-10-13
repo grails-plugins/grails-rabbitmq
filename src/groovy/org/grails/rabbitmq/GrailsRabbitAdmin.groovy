@@ -1,5 +1,7 @@
 package org.grails.rabbitmq
 
+import org.springframework.amqp.core.Binding
+import org.springframework.amqp.core.Exchange
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
@@ -30,10 +32,15 @@ class GrailsRabbitAdmin extends RabbitAdmin implements SmartLifecycle, Applicati
     }
 
     void start() {
+        def exchanges = applicationContext.getBeansOfType(Exchange)?.values()
+        exchanges?.each { ex -> declareExchange ex }
+        
         def queues = applicationContext.getBeansOfType(Queue)?.values()
-        queues?.each { queue ->
-            declareQueue queue
-        }
+        queues?.each { queue -> declareQueue queue }
+        
+        def bindings = applicationContext.getBeansOfType(Binding)?.values()
+        bindings?.each { b -> declareBinding b }
+        
         running = true
     }
 

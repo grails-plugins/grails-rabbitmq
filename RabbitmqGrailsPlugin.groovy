@@ -1,6 +1,7 @@
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.grails.rabbitmq.RabbitQueueBuilder
+import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
@@ -108,17 +109,52 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
             def queuesConfig = application.config.rabbitmq?.queues
             if(queuesConfig) {
                 def queueBuilder = new RabbitQueueBuilder()
+                queuesConfig = queuesConfig.clone()
                 queuesConfig.delegate = queueBuilder
+                queuesConfig.resolveStrategy = Closure.DELEGATE_FIRST
                 queuesConfig()
-                def queues = queueBuilder.queues
-                if(queues) {
-                    queues.each { queue ->
-                        "grails.rabbit.queue.${queue.name}"(Queue, queue.name) {
-                            durable = queue.durable
-                            autoDelete = queue.autoDelete
-                            exclusive = queue.exclusive
-                            arguments = queue.arguments
-                        }
+                
+                // Deal with declared exchanges first.
+                queueBuilder.exchanges?.each { exchange ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering exchange '${exchange.name}'"
+                    }
+                    
+                    "grails.rabbit.exchange.${exchange.name}"(exchange.type, exchange.name) {
+                        durable = exchange.durable
+                        autoDelete = exchange.autoDelete
+                        arguments = exchange.arguments
+                    }
+                }
+                
+                // Next, the queues.
+                queueBuilder.queues?.each { queue ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering queue '${queue.name}'"
+                    }
+                    
+                    "grails.rabbit.queue.${queue.name}"(Queue, queue.name) {
+                        durable = queue.durable
+                        autoDelete = queue.autoDelete
+                        exclusive = queue.exclusive
+                        arguments = queue.arguments
+                    }
+                }
+                
+                // Finally, the bindings between exchanges and queues.
+                queueBuilder.bindings?.each { binding ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering binding between exchange '${binding.exchange}' & queue '${binding.queue}'"
+                    }
+                    
+                    def args = [ ref("grails.rabbit.exchange.${binding.exchange}"), ref ("grails.rabbit.queue.${binding.queue}") ]
+                    if (binding.rule) {
+                        log.debug "Binding with rule '${binding.rule}'"
+                        args << binding.rule.toString()
+                    }
+                    
+                    "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, *args) {
+                        arguments = binding.arguments
                     }
                 }
             }
