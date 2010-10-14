@@ -24,37 +24,33 @@ class AutoQueueMessageListenerContainer extends SimpleMessageListenerContainer i
      * of the exchange (key: 'name') and the routing key (key: 'routing').
      * If no routing key is specified, the match-all wildcard ('#') is used.
      */
-    Object exchange
+    String exchangeBeanName
+
+    /**
+     * The routing key to bind the queue to the exchange with. This is
+     * the 'match-all' wildcard by default: '#'.
+     */
+    String routingKey = '#'
 
     protected void doStart() {
+        // Check the exchange name has been specified.
+        if (!exchangeBeanName) {
+            log.error "Property [exchangeBeanName] must have a value!"
+            return
+        }
+
         // First, create a broker-named, temporary queue.
         def adminBean = applicationContext.getBean(rabbitAdminBeanName)
         def queue = adminBean.declareQueue()
-        
-        // Get the details of the exchange to bind the temporary queue to.
-        def exchangeName = exchange
-        def routingKey = '#'
-        if (exchange instanceof Map) {
-            exchangeName = exchange.name
-            routingKey = exchange.routingKey ?: routingKey
-        }
-        else if (!(exchange instanceof CharSequence)) {
-            log.error "Property [exchange] must be a string or a map - current value: ${exchange.getClass()}"
-            return
-        }
         
         // Now bind this queue to the named exchanged. If the exchange is a
         // fanout, then we don't bind with a routing key. If it's a topic,
         // we use the 'match-all' wildcard. Other exchange types are not
         // supported.
-        def exchange = applicationContext.getBean("grails.rabbit.exchange.${exchangeName}")
+        def exchange = applicationContext.getBean(exchangeBeanName)
         def binding = null
         if (exchange instanceof FanoutExchange) {
             binding = new Binding(queue, exchange)
-            
-            if (exchange instanceof Map && exchange.routingKey) {
-                log.warn "Routing key ignored for fanout exchange '${exchangeName}'"
-            }
         }
         else if (exchange instanceof TopicExchange) {
             binding = new Binding(queue, exchange, routingKey)

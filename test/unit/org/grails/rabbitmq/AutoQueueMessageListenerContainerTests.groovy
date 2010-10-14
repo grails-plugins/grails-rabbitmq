@@ -50,9 +50,9 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
             declareBindingCalled = true
         }
         
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new TopicExchange(exchangeName))
+        mockContext.registerMockBean(exchangeName, new TopicExchange(exchangeName))
         
-        testContainer.exchange = exchangeName
+        testContainer.exchangeBeanName = exchangeName
         testContainer.doStart()
         
         assertTrue "declareBinding() not called", declareBindingCalled
@@ -62,7 +62,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
      * Make sure that a temporary queue is created and that it is bound to the
      * topic exchange with the given name and the given routing key.
      */
-    void testDoStartWithTopicExchangeMap() {
+    void testDoStartWithTopicExchangeAndRoutingKey() {
         def declareBindingCalled = false
         def tempQueueName = "dummy-1235"
         def exchangeName = "another.topic"
@@ -76,35 +76,10 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
             declareBindingCalled = true
         }
         
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new TopicExchange(exchangeName))
+        mockContext.registerMockBean(exchangeName, new TopicExchange(exchangeName))
         
-        testContainer.exchange = [ name: exchangeName, routingKey: routingKey ]
-        testContainer.doStart()
-        
-        assertTrue "declareBinding() not called", declareBindingCalled
-    }
-    
-    /**
-     * Make sure that a temporary queue is created and that it is bound to the
-     * topic exchange with the given name and the 'match-all' wildcard routing
-     * key when no routing key is given in the configuration map.
-     */
-    void testDoStartWithTopicExchangeMapNoRouting() {
-        def declareBindingCalled = false
-        def tempQueueName = "dummy-1235"
-        def exchangeName = "another.topic"
-        
-        mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
-        mockAdminBean.declareBinding = { binding ->
-            assert binding.exchange == exchangeName
-            assert binding.queue == tempQueueName
-            assert binding.routingKey == '#'
-            declareBindingCalled = true
-        }
-        
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new TopicExchange(exchangeName))
-        
-        testContainer.exchange = [ name: exchangeName ]
+        testContainer.exchangeBeanName = exchangeName
+        testContainer.routingKey = routingKey
         testContainer.doStart()
         
         assertTrue "declareBinding() not called", declareBindingCalled
@@ -127,9 +102,9 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
             declareBindingCalled = true
         }
         
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new FanoutExchange(exchangeName))
+        mockContext.registerMockBean(exchangeName, new FanoutExchange(exchangeName))
         
-        testContainer.exchange = exchangeName
+        testContainer.exchangeBeanName = exchangeName
         testContainer.doStart()
         
         assertTrue "declareBinding() not called", declareBindingCalled
@@ -140,7 +115,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
      * fanout exchange with the given name. Even if a routing key is given, it
      * should be ignored.
      */
-    void testDoStartWithFanoutExchangeMap() {
+    void testDoStartWithFanoutExchangeAndRoutingKey() {
         def declareBindingCalled = false
         def tempQueueName = "dummy-1235"
         def exchangeName = "another.fanout"
@@ -154,9 +129,10 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
             declareBindingCalled = true
         }
         
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new FanoutExchange(exchangeName))
+        mockContext.registerMockBean(exchangeName, new FanoutExchange(exchangeName))
         
-        testContainer.exchange = [ name: exchangeName, routingKey: routingKey ]
+        testContainer.exchangeBeanName = exchangeName
+        testContainer.routingKey = routingKey
         testContainer.doStart()
         
         assertTrue "declareBinding() not called", declareBindingCalled
@@ -175,9 +151,9 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
             declareBindingCalled = true
         }
         
-        mockContext.registerMockBean("grails.rabbit.exchange.${exchangeName}", new DirectExchange(exchangeName))
+        mockContext.registerMockBean(exchangeName, new DirectExchange(exchangeName))
         
-        testContainer.exchange = exchangeName
+        testContainer.exchangeBeanName = exchangeName
         testContainer.doStart()
         
         assertFalse "declareBinding() called", declareBindingCalled

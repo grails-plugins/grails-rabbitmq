@@ -109,7 +109,13 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                                 channelTransacted = transactional
                                 connectionFactory = rabbitMQConnectionFactory
                                 concurrentConsumers = connectionFactoryConsumers
-                                exchange = rabbitSubscribe
+                                if (rabbitSubscribe instanceof Map) {
+                                    exchangeBeanName = "grails.rabbit.exchange.${rabbitSubscribe.name}"
+                                    routingKey = rabbitSubscribe.routingKey ?: '#'
+                                }
+                                else {
+                                    exchangeBeanName = "grails.rabbit.exchange.${rabbitSubscribe}"
+                                }
                             }
                         }
                     }
