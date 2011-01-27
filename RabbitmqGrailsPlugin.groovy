@@ -1,11 +1,13 @@
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 import org.grails.rabbitmq.AutoQueueMessageListenerContainer
+import org.grails.rabbitmq.RabbitDynamicMethods
 import org.grails.rabbitmq.RabbitQueueBuilder
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
+
 
 class RabbitmqGrailsPlugin {
     // the plugin version
@@ -168,12 +170,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
     private addDynamicMessageSendingMethods(classes, ctx) {
         if(ctx.rabbitMQConnectionFactory) {
             classes.each { clz ->
-                clz.metaClass.rabbitSend = { Object[] args ->
-                    if(args[-1] instanceof GString) { 
-                        args[-1] = args[-1].toString()
-                    }
-                    ctx.rabbitTemplate.convertAndSend(*args)
-                }
+                RabbitDynamicMethods.applyAllMethods(clz, ctx)
             }
         }
     }
