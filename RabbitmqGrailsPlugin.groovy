@@ -76,6 +76,11 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                 
                 def serviceClass = service.clazz
                 def propertyName = service.propertyName
+
+                def transactional = service.transactional
+                if (!(rabbitmqConfig."${propertyName}".transactional instanceof ConfigObject)) {
+                    transactional = rabbitmqConfig."${propertyName}".transactional as Boolean
+                }
         
                 def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
                 
@@ -84,6 +89,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                         // We manually start the listener once we have attached the
                         // service in doWithApplicationContext.
                         autoStartup = false
+                        channelTransacted = transactional
                         connectionFactory = rabbitMQConnectionFactory
                         concurrentConsumers = connectionFactoryConsumers
                         queueName = rabbitQueue
@@ -100,6 +106,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                                 // We manually start the listener once we have attached the
                                 // service in doWithApplicationContext.
                                 autoStartup = false
+                                channelTransacted = transactional
                                 connectionFactory = rabbitMQConnectionFactory
                                 concurrentConsumers = connectionFactoryConsumers
                                 exchange = rabbitSubscribe

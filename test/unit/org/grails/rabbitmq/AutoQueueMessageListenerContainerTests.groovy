@@ -2,7 +2,6 @@ package org.grails.rabbitmq
 
 import com.rabbitmq.client.AMQP.Queue.DeclareOk
 import com.rabbitmq.client.Channel
-import com.rabbitmq.client.Connection
 import com.rabbitmq.client.Consumer
 import grails.test.GrailsUnitTestCase
 import org.codehaus.groovy.grails.support.MockApplicationContext
@@ -10,6 +9,7 @@ import org.springframework.amqp.core.DirectExchange
 import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
+import org.springframework.amqp.rabbit.connection.Connection
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 
 class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
@@ -23,11 +23,12 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         testContainer.applicationContext = mockContext
         testContainer.connectionFactory = [
             createConnection: {-> [
-                createChannel: {-> [
+                createChannel: { boolean transactional -> [
                     basicQos: {int qos -> },
                     queueDeclarePassive: {String s -> [:] as DeclareOk },
                     basicConsume: {String s, boolean b, Consumer c -> "Test" }
-                ] as Channel }
+                ] as Channel },
+                close: {-> /* Do nothing */ }
             ] as Connection }
         ] as ConnectionFactory
     }
