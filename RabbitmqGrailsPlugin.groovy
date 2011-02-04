@@ -166,7 +166,10 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                     def args = [ ref("grails.rabbit.exchange.${binding.exchange}"), ref ("grails.rabbit.queue.${binding.queue}") ]
                     if (binding.rule) {
                         log.debug "Binding with rule '${binding.rule}'"
-                        args << binding.rule.toString()
+
+                        // Support GString and String for the rule. Other types of rule (Map
+                        // is the only valid option atm) are passed through as is.
+                        args << (binding.rule instanceof CharSequence ? binding.rule.toString() : binding.rule)
                     }
                     
                     "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, *args) {

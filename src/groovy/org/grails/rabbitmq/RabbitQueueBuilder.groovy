@@ -50,8 +50,6 @@ class RabbitQueueBuilder {
                 log.warn "'${currentExchange.name}' is a fanout exchange - binding for queue '${methodName}' ignored"
                 break
 
-/* Enable once we have a version of Spring AMQP with HeadersExchange included
-
             case HeadersExchange:
                 if (!(argsMap.binding instanceof Map)) {
                     throw new RuntimeException(
@@ -62,7 +60,6 @@ class RabbitQueueBuilder {
 
                 newBinding.rule = argsMap.binding
                 break
-*/
 
             case TopicExchange:
                 if (!(argsMap.binding instanceof CharSequence)) {
