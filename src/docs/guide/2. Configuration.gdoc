@@ -1,5 +1,4 @@
-The plugin supports a number of configuration options which all may be expressed in @grails-app/conf/Config.groovy@.  A
-basic configuration might look something like this:
+The plugin supports a number of configuration options which all may be expressed in @grails-app/conf/Config.groovy@. A basic configuration might look something like this:
 
 {code}
 // grails-app/conf/Config.groovy
@@ -12,8 +11,7 @@ rabbitmq {
 }
 {code}
 
-Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a
-RabbitMQ server.
+Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a RabbitMQ server.
 
 Following is a list of other configuration settings supported by the plugin.
 
