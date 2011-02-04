@@ -12,7 +12,7 @@ class RabbitDynamicMethods {
     
     static void applyAllMethods(target, ctx) {
         applyRabbitSend(target, ctx)
-        applyRabbitRpcSend(target, ctx)
+//        applyRabbitRpcSend(target, ctx)
     }
     
     static void applyRabbitSend(target, ctx) {
@@ -28,8 +28,10 @@ class RabbitDynamicMethods {
 
     static void applyRabbitRpcSend(target, ctx) {
         target.metaClass.rabbitRpcSend = { Object[] args ->
-            // Last argument is either a reply-queue name, a closure, or a
-            // service listener.
+            // Last argument is a reply queue name
+            // TODO add support for a closure or a service listener as an alternative
+            // to the reply queue name. In those cases, the reply queue should automatically
+            // be created and the closure/listener invoked when the reply is received.
             def newArgs = args.toList()
             def reply = newArgs.pop()
             newArgs = processArgs(newArgs)
