@@ -1,0 +1,5 @@
+To run the integration tests for this project, you will need to have a RabbitMQ broker running on localhost with:
+
+Virtual Host: plugin-test
+User: dilbert
+Password: password

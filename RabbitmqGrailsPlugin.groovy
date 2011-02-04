@@ -49,6 +49,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
         
         def connectionFactoryUsername = connectionFactoryConfig?.username
         def connectionFactoryPassword = connectionFactoryConfig?.password
+        def connectionFactoryVirtualHost = connectionFactoryConfig?.virtualHost
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
         def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
         def connectionFactoryConsumers = rabbitmqConfig.concurrentConsumers ?: 1
@@ -67,6 +68,10 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
                 channelCacheSize = connectionChannelCacheSize
+
+                if (connectionFactoryVirtualHost) {
+                    virtualHost = connectionFactoryVirtualHost
+                }
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
