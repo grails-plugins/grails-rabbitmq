@@ -1,6 +1,4 @@
-The plugin adds a method named @rabbitSend@ to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
-@rabbitSend@ method accepts 2 parameters.  The first parameter is a queue name and the second parameter is the message
-being sent.
+The plugin adds a method named @rabbitSend@ to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The @rabbitSend@ method accepts 2 parameters. The first parameter is a queue name and the second parameter is the message being sent.
 
 {code}
 class MessageController {
