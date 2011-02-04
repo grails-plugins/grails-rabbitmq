@@ -1,36 +1,6 @@
-The plugin provides a convention based mechanism for associating a listener with a Queue.  Any Grails Service may
-express that it wants to receive messages on a specific Queue by defining a static property named @rabbitQueue@ and
-assigning the property a String which represents the name of a Queue.
+The plugin provides two simple ways of consuming messages:
 
-{code}
-package org.grails.rabbitmq.test
+# from a named Queue
+# by subscribing to an exchange (the traditional pub/sub model)
 
-class DemoService {
-    static rabbitQueue = 'someQueueName'
-
-    void handleMessage(message) {
-        // handle message...
-    }
-}
-{code}
-
-Messages are delivered to the Service by invoking the @handleMessage@ method.
-
-Different message types may be handled with overloaded versions of @handleMessage@.
-
-{code}
-package org.grails.rabbitmq.test
-
-class DemoService {
-    static rabbitQueue = 'someQueueName'
-
-    void handleMessage(String textMessage) {
-        // handle String message...
-    }
-    
-    void handleMessage(Map mapMessage) {
-        // handle Map message///
-    }
-}
-{code}
-
+Which approach you take depends on whether you want to implement the pub/sub messaging model and how much control you need.
