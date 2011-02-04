@@ -43,3 +43,5 @@ autoDelete | If @true@, the queue will be removed from the broker when there are
 durable | If @true@, the queue will survive a restart of the broker.
 exclusive | Only the client that created the queue can connect to it.
 {table}
+
+One final thing: when you declare a standalone queue like this, it automatically gets bound to the broker's default exchange, which has an implicit name of '', i.e. the empty string. You can easily send messages to this queue via the [rabbitSend|allClasses] method.
