@@ -2,7 +2,7 @@ package org.example
 
 import grails.test.*
 
-class MessageSerializationTests extends GroovyTestCase {
+class MessageSerializationTests extends AbstractTestCase {
     def producerService
 
     protected void tearDown() {
@@ -23,14 +23,5 @@ class MessageSerializationTests extends GroovyTestCase {
         assert tryUntil(500, 10000) {
             Person.count() == 5
         }, "Person messages have not been consumed"
-    }
-
-    boolean tryUntil(long frequency, long timeout, c) {
-        long start = System.currentTimeMillis()
-        while ((System.currentTimeMillis() - start) < timeout) {
-            def result = c.call()
-            if (result) return true
-            else Thread.sleep(frequency)
-        }
     }
 }
