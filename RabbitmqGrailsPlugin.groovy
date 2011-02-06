@@ -143,8 +143,8 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                     }
                     
                     "grails.rabbit.exchange.${exchange.name}"(exchange.type, exchange.name) {
-                        durable = exchange.durable
-                        autoDelete = exchange.autoDelete
+                        durable = Boolean.valueOf(exchange.durable)
+                        autoDelete = Boolean.valueOf(exchange.autoDelete)
                         arguments = exchange.arguments
                     }
                 }

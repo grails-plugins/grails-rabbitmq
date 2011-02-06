@@ -27,6 +27,11 @@ rabbitmq {
         // shutdown. Otherwise, when the listener shuts down the queue would
         // be deleted.
         fooTxn autoDelete: false, durable: false, exclusive: true
+
+        // Test exchange declaration.
+        exchange name: "myEx", type: topic, durable: false, {
+            sharesConsumer autoDelete: true, exclusive: true, durable: false, binding: "NYSE.#"
+        }
     }
 }
 
