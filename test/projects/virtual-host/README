@@ -3,3 +3,5 @@ To run the integration tests for this project, you will need to have a RabbitMQ 
 Virtual Host: plugin-test
 User: dilbert
 Password: password
+
+Don't forget to make sure that the 'dilbert' user has permissions on the 'plugin-test' virtual host!
