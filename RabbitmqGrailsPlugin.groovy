@@ -35,6 +35,12 @@ class RabbitmqGrailsPlugin {
 The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
 '''
 
+    def license = "APACHE"
+    def organization = [ name: "SpringSource", url: "http://www.springsource.org/" ]
+    def developers = [ [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ] ]
+    def issueManagement = [ system: "JIRA", url: "http://jira.codehaus.org/browse/GRAILSPLUGINS" ]
+    def scm = [ url: "http://svn.grails-plugins.codehaus.org/browse/grails-plugins/" ]
+
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/rabbitmq"
     
