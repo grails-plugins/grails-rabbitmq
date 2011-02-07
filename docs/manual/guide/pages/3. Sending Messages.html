@@ -5,13 +5,12 @@
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
     </head>
     <body class="body">
-    The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The
-<code>rabbitSend</code> method accepts 2 parameters.  The first parameter is a queue name and the second parameter is the message
-being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
+    The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The <code>rabbitSend</code> method accepts 2 parameters. The first parameter is a queue name and the second parameter is the message being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
         rabbitSend 'someQueueName', 'someMessage'
         &#8230;
     &#125;
 &#125;</pre></div><p class="paragraph"/>Messages may also be sent by interacting with the <code>RabbitTemplate</code> Spring bean directly.  See the <a href="../guide/single.html#5. Using The RabbitTemplate Directly" class="guide">Using The RabbitTemplate Directly</a> 
 section for more information.
+
     </body>
 </html>

@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>4.1 Pub-Sub</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    One of the most common messaging models people use involves a producer broadcasting messages to all registered listeners (or more accurately, consumers). This is known as the publish/subscribe model, or pub/sub for short. There are two steps to getting this set up in Grails:
+<ol>
+<li>create the exchange you're going to publish messages to</li>
+<li>create some consumers that subscribe to that exchange</li>
+</ol><p class="paragraph"/>The first step can be done either outside of the Grails application or in the plugin's configuration. If the Grails application is the publisher, then it makes sense to declare the exchange in <code>grails-app/conf/Config.groovy</code>.<p class="paragraph"/>The second step is dead easy with the plugin: create a service with a static <code>rabbitSubscribe</code> property and a <code>handleMessage()</code> method. Here's an example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.example<p class="paragraph"/>class SharesService &#123;
+    <span class="java&#45;keyword">static</span> rabbitSubscribe = 'shares'<p class="paragraph"/>    void handleMessage(message) &#123;
+        // handle message&#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>As long as the broker contains an exchange with the name <code>shares</code>, the <code>SharesService</code> will receive all messages sent to that exchange. Every time a message is received from the broker, the service's <code>handleMessage()</code> method is called with the message as its argument. We'll talk more about messages shortly.<p class="paragraph"/><blockquote class="note">
+The <code>rabbitSubscribe</code> option only makes sense when applied to fanout and topic exchanges.
+</blockquote><p class="paragraph"/>In the case of a topic exchange, you can filter messages based on the routing key. By default your service will receive all messages, but you can override this with an alternative syntax for <code>rabbitSubscribe</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.example<p class="paragraph"/>class SharesService &#123;
+    <span class="java&#45;keyword">static</span> rabbitSubscribe = &#91; name: 'shares', routingKey: 'NYSE.GE' &#93;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>In this example, the service will only receive messages that have a routing key of 'GE'. Of course, you can use standard AMQP wildcards too like 'NYSE.#', which will match all messages with a routing key that starts with 'NYSE.'.<p class="paragraph"/>Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.<p class="paragraph"/>
+    </body>
+</html>

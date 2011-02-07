@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>4.3 Messages</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    What is a message? In the examples you've seen in this section, the message has been some arbitrary object but we haven't discussed what the type of that object might be. That's because, it can be pretty much anything! Within the messaging system, the content of a message is simply a byte array - it's up to the producer can consumer to interpret/convert that raw data.<p class="paragraph"/>Fortunately the plugin (via <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/reference/htmlsingle/#d0e335" target="blank">Spring AMQP</a>) automatically handles messages whose content is in familiar forms, including:
+<ul class="star">
+<li>strings</li>
+<li>byte arrays</li>
+<li>maps</li>
+<li>other serializable types</li>
+</ul><p class="paragraph"/>One manifestation of this support is that different message types may be handled with overloaded versions of <code>handleMessage()</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(<span class="java&#45;object">String</span> textMessage) &#123;
+        // handle <span class="java&#45;object">String</span> message&#8230;
+    &#125;<p class="paragraph"/>    void handleMessage(Map mapMessage) &#123;
+        // handle Map message&#8230;
+    &#125;<p class="paragraph"/>    void handleMessage(<span class="java&#45;object">byte</span>&#91;&#93; byteMessage) &#123;
+        // handle <span class="java&#45;object">byte</span> array message&#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This is a great convenience, but be aware that using serializable Java objects limits the types of client you can interact with. If all the clients you're interested in are using Spring AMQP, then you should be fine, but don't expect Ruby or Python clients to handle <code>Map</code> messages! For production systems, we recommend you use strings and byte arrays.
+
+    </body>
+</html>

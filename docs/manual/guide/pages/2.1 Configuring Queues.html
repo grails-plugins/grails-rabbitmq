@@ -5,10 +5,7 @@
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
     </head>
     <body class="body">
-    Queues must be declared in the RabbitMQ server before consumers can be associated with those Queues and before messages
-may be sent to those Queues.  If the Grails application will be sending messages to or receiving messages from Queues 
-that may not already be declared in the RabbitMQ server, the application needs to declare those Queues up front.  One 
-way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>.  That 
+    Queues must be declared in the RabbitMQ server before consumers can be associated with those queues and before messages may be sent to those queues. If the Grails application will be sending messages to or receiving messages from queues that may not already be declared in the RabbitMQ server, the application needs to declare those queues up front. One way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>. That 
 might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/spring/resources.groovy
 beans = &#123;
     myQueue(org.springframework.amqp.core.Queue, 'myQueueName') 
@@ -18,9 +15,7 @@ beans = &#123;
         exclusive = <span class="java&#45;keyword">false</span>
         arguments = &#91;arg1: 'val1', arg2: 'val2'&#93;
     &#125;
-&#125;</pre></div><p class="paragraph"/>The plugin also supports a DSL for describing these Queues.  This DSL is expressed in
-<code>grails-app/conf/Config.groovy</code>.  The code below shows how to describe same Queues that
-were described in the previous code sample.<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
+&#125;</pre></div><p class="paragraph"/>The plugin also supports a DSL for describing these queues. This DSL is expressed in <code>grails-app/conf/Config.groovy</code>. The code below configures the same queues as the previous code sample.<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
 rabbitmq &#123;
     connectionfactory &#123;
         username = 'guest'
@@ -33,6 +28,7 @@ rabbitmq &#123;
     &#125;
 &#125;</pre></div><p class="paragraph"/><blockquote class="note">
 With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.
-</blockquote>
+</blockquote><p class="paragraph"/>So what do those queue options mean?<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Option</strong></th><th><strong class="bold">Description</strong></th></tr><tr class="table-odd"><td>autoDelete</td><td>If <code>true</code>, the queue will be removed from the broker when there are no more clients attached to it. Note that this doesn't take effect until after at least one client connects to the queue.</td></tr><tr class="table-even"><td>durable</td><td>If <code>true</code>, the queue will survive a restart of the broker.</td></tr><tr class="table-odd"><td>exclusive</td><td>Only the client that created the queue can connect to it.</td></tr></table><p class="paragraph"/>One final thing: when you declare a standalone queue like this, it automatically gets bound to the broker's default exchange, which has an implicit name of '', i.e. the empty string. You can easily send messages to this queue via the <a href="../ref/All Classes/rabbitSend.html" class="allClasses">rabbitSend</a> method.
+
     </body>
 </html>

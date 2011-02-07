@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>RabbitMQ Plugin 0.3 - Reference Documentation</title>
+        <link rel="stylesheet" href="../../css/ref.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    <h1>rabbitSend</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Sends a message to a RabbitMQ broker.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>// Send a string message to the <span class="java&#45;keyword">default</span> direct exchange. It will be routed to any
+// queues that are bound to the <span class="java&#45;keyword">default</span> exchange with the key '' (an empty string).
+rabbitSend <span class="java&#45;quote">"Some message"</span><p class="paragraph"/>// Send a map message to the <span class="java&#45;keyword">default</span> direct exchange. The message will be routed to
+// the queue with the name 'myQueue'.
+rabbitSend <span class="java&#45;quote">"myQueue"</span>, &#91;cmd: <span class="java&#45;quote">"addBook"</span>, title: <span class="java&#45;quote">"The Shining"</span>, author: <span class="java&#45;quote">"Stephen King"</span>&#93;<p class="paragraph"/>// Send a string message to a 'prices' exchange with a routing key of 'shares.NYSE.GE'.
+rabbitSend <span class="java&#45;quote">"prices"</span>, <span class="java&#45;quote">"shares.NYSE.GE"</span>, <span class="java&#45;quote">"$354.23"</span></pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>rabbitSend()</code> method is basically a convenience over the <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/reference/htmlsingle/#d0e335" target="blank">Spring AMQP convertAndSend()</a> method. It has three basic forms:<p class="paragraph"/><div class="code"><pre>rabbitSend message
+rabbitSend routingKey, message
+rabbitSend exchangeName, routingKey, message</pre></div><p class="paragraph"/>If <code>routingKey</code> is left out, it defaults to a value of '', i.e. the empty string. The same goes for <code>exchangeName</code>, in which case the message is routed to the queue with the same name as the routing key (if specified).<p class="paragraph"/>The message can be any serializable type, although if you want to interoperate with non-Java clients, it's best to stick to string and byte array messages.<p class="paragraph"/>For complex requirements, you can even pass in an object that processes the message after construction. See the Spring AMQP guide for more information on that.
+
+    </body>
+</html>
