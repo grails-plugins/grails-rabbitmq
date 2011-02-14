@@ -14,15 +14,6 @@ grails.project.dependency.resolution = {
         grailsHome()
         grailsCentral()
         mavenCentral()
-
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenLocal()
-        //mavenCentral()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://maven.springframework.org/milestone'
     }
     dependencies {
@@ -30,6 +21,7 @@ grails.project.dependency.resolution = {
         runtime ('org.springframework.amqp:spring-rabbit:1.0.0.M2') {
             excludes 'junit',
                      'spring-aop',
+                     'spring-core', // Use spring-core from Grails.
                      'spring-oxm',
                      'spring-test',
                      'spring-tx',
