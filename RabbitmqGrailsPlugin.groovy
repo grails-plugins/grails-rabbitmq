@@ -12,7 +12,7 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "0.3"
+    def version = "0.3.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
@@ -39,10 +39,10 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
     def organization = [ name: "SpringSource", url: "http://www.springsource.org/" ]
     def developers = [ [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ] ]
     def issueManagement = [ system: "JIRA", url: "http://jira.codehaus.org/browse/GRAILSPLUGINS" ]
-    def scm = [ url: "http://svn.grails-plugins.codehaus.org/browse/grails-plugins/" ]
+    def scm = [ url: "https://github.com/grails-plugins/grails-rabbitmq" ]
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/rabbitmq"
+    def documentation = "http://grails-plugins.github.com/grails-rabbitmq/"
     
     def loadAfter = ['services']
     def observe = ['*']
