@@ -13,13 +13,13 @@ class NonTxnService {
         else {
             // As the service is non-transactional, we'll have to save our status message
             // in a new Hibernate session.
-            Status.withNewSession {
-                try {
+            try {
+                Status.withTransaction {
                     new Status(message: msg).save(failOnError: true, flush: true)
                 }
-                catch (Exception ex) {
-                    ex.printStackTrace()
-                }
+            }
+            catch (Exception ex) {
+                ex.printStackTrace()
             }
         }
     }
