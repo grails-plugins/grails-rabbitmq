@@ -14,16 +14,20 @@ class RabbitQueueBuilder {
     private currentExchange
     
     def methodMissing(String methodName, args) {
-        def queue = new Queue(methodName)
+        def queue
 
         def argsMap = args ? args[0] : [:]
         if(argsMap) {
-            queue.autoDelete = Boolean.valueOf(argsMap.autoDelete)
-            queue.exclusive = Boolean.valueOf(argsMap.exclusive)
-            queue.durable = Boolean.valueOf(argsMap.durable)
+            def autoDelete = Boolean.valueOf(argsMap.autoDelete)
+            def exclusive = Boolean.valueOf(argsMap.exclusive)
+            def durable = Boolean.valueOf(argsMap.durable)
+            def arguments
             if(argsMap.arguments instanceof Map) {
-                queue.arguments = argsMap.arguments
+                arguments = argsMap.arguments
             }
+            queue = new Queue(methodName, durable, exclusive, autoDelete, arguments)
+        } else {
+            queue = new Queue(methodName)
         }
 
         // If we are nested inside of an exchange definition, create

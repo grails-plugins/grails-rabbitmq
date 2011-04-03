@@ -63,7 +63,7 @@ class AutoQueueMessageListenerContainer extends SimpleMessageListenerContainer i
         adminBean.declareBinding(binding)
         
         // Let the super class do the rest.
-        super.setQueueName(queue.name)
+        super.setQueueNames(queue.name)
         super.doStart()
     }
 }
