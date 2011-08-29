@@ -14,11 +14,10 @@ grails.project.dependency.resolution = {
         grailsHome()
         grailsCentral()
         mavenCentral()
-        mavenRepo 'http://maven.springframework.org/milestone'
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        runtime ('org.springframework.amqp:spring-rabbit:1.0.0.RC1') {
+        runtime ('org.springframework.amqp:spring-rabbit:1.0.0.RELEASE') {
             excludes 'junit',
                      'spring-aop',
                      'spring-core', // Use spring-core from Grails.

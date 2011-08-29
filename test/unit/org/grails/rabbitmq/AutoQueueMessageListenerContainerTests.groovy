@@ -45,7 +45,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
         mockAdminBean.declareBinding = { binding ->
             assert binding.exchange == exchangeName
-            assert binding.queue == tempQueueName
+            assert binding.destination == tempQueueName
             assert binding.routingKey == '#'
             declareBindingCalled = true
         }
@@ -71,7 +71,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
         mockAdminBean.declareBinding = { binding ->
             assert binding.exchange == exchangeName
-            assert binding.queue == tempQueueName
+            assert binding.destination == tempQueueName
             assert binding.routingKey == routingKey
             declareBindingCalled = true
         }
@@ -97,7 +97,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
         mockAdminBean.declareBinding = { binding ->
             assert binding.exchange == exchangeName
-            assert binding.queue == tempQueueName
+            assert binding.destination == tempQueueName
             assert !binding.routingKey
             declareBindingCalled = true
         }
@@ -124,7 +124,7 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
         mockAdminBean.declareBinding = { binding ->
             assert binding.exchange == exchangeName
-            assert binding.queue == tempQueueName
+            assert binding.destination == tempQueueName
             assert !binding.routingKey
             declareBindingCalled = true
         }

@@ -31,9 +31,9 @@ class RabbitDynamicMethodsTests extends GrailsUnitTestCase {
             // in the message properties properly.
             def msg = new Message(ex.bytes, new MessageProperties()) 
             mpp.postProcessMessage(msg)
-            assert msg.messageProperties?.replyTo?.routingKey == "replyQ"
+            assert msg.messageProperties?.replyToAddress?.routingKey == "replyQ"
         }
-        
+
         def testContext = new MockApplicationContext()
         testContext.registerMockBean "rabbitTemplate", tmplControl.createMock()
         RabbitDynamicMethods.applyRabbitRpcSend(Map, testContext)

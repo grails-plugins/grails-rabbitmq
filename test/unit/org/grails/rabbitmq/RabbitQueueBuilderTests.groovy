@@ -21,7 +21,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         def queue = queues[0]
         
         assertEquals 'wrong queue name', 'foo', queue.name
-        assertEquals 'wrong durable value', false, queue.durable
+        assertEquals 'wrong durable value', true, queue.durable
         assertEquals 'wrong auto delete value', false, queue.autoDelete
         assertEquals 'wrong exclusive value', false, queue.exclusive
         assertNull 'no arguments expected', queue.arguments
