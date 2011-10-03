@@ -8,7 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
-
+import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
 class RabbitmqGrailsPlugin {
     // the plugin version
@@ -104,7 +104,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                         channelTransacted = transactional
                         connectionFactory = rabbitMQConnectionFactory
                         concurrentConsumers = connectionFactoryConsumers
-                        queueName = rabbitQueue
+                        queueNames = rabbitQueue
                     }
                 }
                 else {
@@ -147,12 +147,11 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                     if (log.debugEnabled) {
                         log.debug "Registering exchange '${exchange.name}'"
                     }
-                    
-                    "grails.rabbit.exchange.${exchange.name}"(exchange.type, exchange.name) {
-                        durable = Boolean.valueOf(exchange.durable)
-                        autoDelete = Boolean.valueOf(exchange.autoDelete)
-                        arguments = exchange.arguments
-                    }
+
+                    "grails.rabbit.exchange.${exchange.name}"(exchange.type, exchange.name,
+                            Boolean.valueOf(exchange.durable),
+                            Boolean.valueOf(exchange.autoDelete),
+                            exchange.arguments)
                 }
                 
                 // Next, the queues.
@@ -160,13 +159,13 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                     if (log.debugEnabled) {
                         log.debug "Registering queue '${queue.name}'"
                     }
-                    
-                    "grails.rabbit.queue.${queue.name}"(Queue, queue.name) {
-                        durable = queue.durable
-                        autoDelete = queue.autoDelete
-                        exclusive = queue.exclusive
-                        arguments = queue.arguments
-                    }
+
+                    "grails.rabbit.queue.${queue.name}"(Queue, queue.name,
+                            Boolean.valueOf(queue.durable),
+                            Boolean.valueOf(queue.exclusive),
+                            Boolean.valueOf(queue.autoDelete),
+                            queue.arguments,
+                    )
                 }
                 
                 // Finally, the bindings between exchanges and queues.
@@ -183,10 +182,8 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                         // is the only valid option atm) are passed through as is.
                         args << (binding.rule instanceof CharSequence ? binding.rule.toString() : binding.rule)
                     }
-                    
-                    "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, *args) {
-                        arguments = binding.arguments
-                    }
+
+                    "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
                 }
             }
         }   
