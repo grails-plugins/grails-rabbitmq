@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
+import org.springframework.amqp.support.converter.MessageConverter
 import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
 class RabbitmqGrailsPlugin {
@@ -208,6 +209,17 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                 def adapter = new MessageListenerAdapter()
                 def serviceName = beanName - LISTENER_CONTAINER_SUFFIX
                 adapter.delegate = applicationContext.getBean(serviceName)
+
+                if (adapter.delegate.metaClass.hasProperty(adapter.delegate, 'messageConverter')) {
+                    def loader = new GroovyClassLoader(getClass().classLoader)
+                    MessageConverter messageConverterObj = null
+                    if (adapter.delegate.messageConverter) {
+                        def MessageConverterClass = loader.loadClass(adapter.delegate.messageConverter)
+                        messageConverterObj = (MessageConverter) MessageConverterClass.newInstance()
+                    }
+                    adapter.setMessageConverter(messageConverterObj)
+                }
+
                 bean.messageListener = adapter
                 
                 // Now that the listener is properly configured, we can start it.
