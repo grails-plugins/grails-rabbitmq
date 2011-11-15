@@ -86,7 +86,7 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                 connectionFactory = rabbitMQConnectionFactory
             }
             adm(RabbitAdmin, rabbitMQConnectionFactory)
-
+            Set registeredServices = new HashSet()
             application.serviceClasses.each { service ->
                 def serviceClass = service.clazz
                 def propertyName = service.propertyName
@@ -101,6 +101,9 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                     if(configHolder.isServiceEnabled(service)) {
                         def serviceConcurrentConsumers = configHolder.getServiceConcurrentConsumers(service)
                         log.info("Setting up rabbitmq listener for ${service.clazz} with ${serviceConcurrentConsumers} consumer(s)")
+                        if(!registeredServices.add(propertyName)){
+                            throw new IllegalArgumentException("Unable to initialize rabbitmq listeners properly. More than one service named ${propertyName}.")
+                        }
 
                         "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
                             // We manually start the listener once we have attached the
@@ -125,6 +128,9 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
                             if(configHolder.isServiceEnabled(service)) {
                                 def serviceConcurrentConsumers = configHolder.getServiceConcurrentConsumers(service)
                                 log.info("Setting up rabbitmq listener for ${service.clazz} with ${serviceConcurrentConsumers} consumer(s)")
+                                if(!registeredServices.add(propertyName)){
+                                    throw new IllegalArgumentException("Unable to initialize rabbitmq listeners properly. More than one service named ${propertyName}.")
+                                }
                                 "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(AutoQueueMessageListenerContainer) {
                                     // We manually start the listener once we have attached the
                                     // service in doWithApplicationContext.

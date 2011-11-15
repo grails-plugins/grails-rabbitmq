@@ -13,18 +13,17 @@ import org.codehaus.groovy.grails.commons.GrailsClass
  */
 class RabbitGrailsPluginTests extends GroovyTestCase {
 
-    def createPluginFileInstance() {
+    def createPluginFileInstance(application=[:]) {
         String[] roots = ['./']
         ClassLoader loader = this.getClass().getClassLoader()
         def engine = new GroovyScriptEngine(roots, loader)
         def pluginClass = engine.loadScriptByName('RabbitmqGrailsPlugin.groovy')
-        return pluginClass.newInstance()
+        def pluginInstance = pluginClass.newInstance()
+        pluginInstance.metaClass.application = application
+        return pluginInstance
     }
 
     void testQueueAndExchangeSetup() {
-        // load the base plugin file
-        def base = createPluginFileInstance()
-
         // mock up test configuration
         def application = new Object()
 
@@ -46,7 +45,7 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
                 }
             }
         """)
-        base.metaClass.application = application
+        def base = createPluginFileInstance(application)
 
         // run a spring builder to create context
         def bb = new BeanBuilder()
@@ -78,7 +77,6 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
     }
 
     void testServiceDisabling() {
-        def base = createPluginFileInstance()
         def blueService = new MockQueueService(propertyName: 'blueService')
         def pinkService = new MockQueueService(propertyName: 'pinkService')
         def redService = new MockSubscribeService(propertyName: 'redService')
@@ -109,7 +107,7 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
             }
         """)
 
-        base.metaClass.application = application
+        def base = createPluginFileInstance(application)
 
         def bb = new BeanBuilder()
         bb.beans base.doWithSpring
@@ -122,6 +120,44 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
             ctx.getBean('redService_MessageListenerContainer')
         }
         assert ctx.getBean('tealService_MessageListenerContainer')
+    }
+
+    void testQueueFailureWhenMultipleListenersHaveSameName() {
+        def blueService1 = new MockQueueService(propertyName: 'blueService')
+        def blueService2 = new MockQueueService(propertyName: 'blueService')
+        def redService1 = new MockSubscribeService(propertyName: 'redService')
+        def redService2 = new MockSubscribeService(propertyName: 'redService')
+
+        def application = new Object()
+        application.metaClass.getServiceClasses = {
+            return [blueService1, blueService2]
+        }
+
+        application.metaClass.config = new ConfigSlurper().parse("""
+            rabbitmq {
+                connectionfactory {
+                    username = 'guest'
+                    password = 'guest'
+                    hostname = 'localhost'
+                }
+            }
+        """)
+        def queueServices = createPluginFileInstance(application)
+
+        def msg = shouldFail(IllegalArgumentException){
+            new BeanBuilder().beans queueServices.doWithSpring
+        }
+        assert msg.contains('blueService')
+
+        application.metaClass.getServiceClasses = {
+            return [redService1, redService2]
+        }
+
+        def subscribeServices = createPluginFileInstance(application)
+        msg = shouldFail(IllegalArgumentException){
+            new BeanBuilder().beans subscribeServices.doWithSpring
+        }
+        assert msg.contains('redService')
     }
 
 }
