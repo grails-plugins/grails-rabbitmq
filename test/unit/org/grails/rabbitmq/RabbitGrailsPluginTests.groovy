@@ -1,27 +1,37 @@
 package org.grails.rabbitmq
 
 import grails.spring.BeanBuilder
-import org.springframework.amqp.core.TopicExchange
-import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Binding.DestinationType
+import org.springframework.amqp.core.Queue
+import org.springframework.amqp.core.TopicExchange
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
+import org.codehaus.groovy.grails.commons.GrailsClass
 
 /**
  * Test cases for main plugin file setup.
  */
 class RabbitGrailsPluginTests extends GroovyTestCase {
 
-    void testQueueAndExchangeSetup(){
-        // load the base plugin file
+    def createPluginFileInstance() {
         String[] roots = ['./']
         ClassLoader loader = this.getClass().getClassLoader()
         def engine = new GroovyScriptEngine(roots, loader)
         def pluginClass = engine.loadScriptByName('RabbitmqGrailsPlugin.groovy')
-        def base = pluginClass.newInstance()
+        return pluginClass.newInstance()
+    }
+
+    void testQueueAndExchangeSetup() {
+        // load the base plugin file
+        def base = createPluginFileInstance()
 
         // mock up test configuration
-        base.metaClass.application = [:]
-        base.application.config = new ConfigSlurper().parse("""
+        def application = new Object()
+
+        application.metaClass.getServiceClasses = {
+            return []
+        }
+        application.metaClass.config =  new ConfigSlurper().parse("""
             rabbitmq {
                 connectionfactory {
                     username = 'guest'
@@ -36,6 +46,7 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
                 }
             }
         """)
+        base.metaClass.application = application
 
         // run a spring builder to create context
         def bb = new BeanBuilder()
@@ -66,4 +77,65 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
         assertEquals(ibBind.destinationType, DestinationType.QUEUE)
     }
 
+    void testServiceDisabling() {
+        def base = createPluginFileInstance()
+        def blueService = new MockQueueService(propertyName: 'blueService')
+        def pinkService = new MockQueueService(propertyName: 'pinkService')
+        def redService = new MockSubscribeService(propertyName: 'redService')
+        def tealService = new MockSubscribeService(propertyName: 'tealService')
+
+        def application = new Object()
+        application.metaClass.getServiceClasses = {
+            return [blueService, redService, pinkService, tealService]
+        }
+
+        application.metaClass.config = new ConfigSlurper().parse("""
+            rabbitmq {
+                connectionfactory {
+                    username = 'guest'
+                    password = 'guest'
+                    hostname = 'localhost'
+                }
+                services {
+                    blueService {
+                        concurrentConsumers = 5
+                        disableListening = false
+                    }
+                    redService {
+                        concurrentConsumers = 4
+                        disableListening = true
+                    }
+                }
+            }
+        """)
+
+        base.metaClass.application = application
+
+        def bb = new BeanBuilder()
+        bb.beans base.doWithSpring
+        def ctx = bb.createApplicationContext()
+
+        assert ctx.getBean('blueService_MessageListenerContainer').concurrentConsumers == 5
+        assert ctx.getBean('pinkService_MessageListenerContainer').concurrentConsumers == 1
+
+        shouldFail(NoSuchBeanDefinitionException) {
+            ctx.getBean('redService_MessageListenerContainer')
+        }
+        assert ctx.getBean('tealService_MessageListenerContainer')
+    }
+
+}
+
+static class MockSubscribeService {
+    static rabbitSubscribe = 'blueExchange'
+    static transactional = false
+    def propertyName
+    def clazz = MockSubscribeService.class
+}
+
+static class MockQueueService {
+    static rabbitQueue = 'blueQueue'
+    static transactional = false
+    def propertyName
+    def clazz = MockQueueService.class
 }
