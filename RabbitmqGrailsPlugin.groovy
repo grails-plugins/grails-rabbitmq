@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 import org.grails.rabbitmq.RabbitConfigurationHolder
+import org.springframework.jndi.JndiObjectFactoryBean
 
 class RabbitmqGrailsPlugin {
     // the plugin version
@@ -57,13 +58,14 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
 
         def connectionFactoryConfig = rabbitmqConfig?.connectionfactory
         
+        def connectionFactoryJndiName = connectionFactoryConfig?.jndiName
         def connectionFactoryUsername = connectionFactoryConfig?.username
         def connectionFactoryPassword = connectionFactoryConfig?.password
         def connectionFactoryVirtualHost = connectionFactoryConfig?.virtualHost
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
         def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
 
-        if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
+        if(!connectionFactoryJndiName && (!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname)) {
             log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
         } else {
           
@@ -73,14 +75,21 @@ The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
             def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
-            rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
-                username = connectionFactoryUsername
-                password = connectionFactoryPassword
-                channelCacheSize = connectionChannelCacheSize
+            if(!connectionFactoryJndiName){
+              rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
+                  username = connectionFactoryUsername
+                  password = connectionFactoryPassword
+                  channelCacheSize = connectionChannelCacheSize
 
-                if (connectionFactoryVirtualHost) {
-                    virtualHost = connectionFactoryVirtualHost
-                }
+                  if (connectionFactoryVirtualHost) {
+                      virtualHost = connectionFactoryVirtualHost
+                  }
+              }
+            }else{
+              underlyingConnectionFactory(JndiObjectFactoryBean){
+                jndiName=connectionFactoryJndiName
+              }
+              rabbitMQConnectionFactory(connectionFactoryClass, underlyingConnectionFactory)
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
