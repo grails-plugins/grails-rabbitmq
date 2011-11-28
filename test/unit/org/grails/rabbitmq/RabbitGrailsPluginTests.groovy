@@ -7,7 +7,8 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.codehaus.groovy.grails.commons.GrailsClass
-
+import com.rabbitmq.client.ConnectionFactory
+import org.springframework.mock.jndi.SimpleNamingContextBuilder
 /**
  * Test cases for main plugin file setup.
  */
@@ -22,7 +23,49 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
         pluginInstance.metaClass.application = application
         return pluginInstance
     }
+    
+    void testJndiConfiguredConnectionFactory(){
+        // setup the initial context
+        def jndiBuilder = new SimpleNamingContextBuilder()
+        jndiBuilder.bind('amqp/connectionFactory', new ConnectionFactory(username:'guest', password:'guest', host:'localhost'))
+        jndiBuilder.activate()
+        // mock up test configuration
+        def application = new Object()
 
+        application.metaClass.getServiceClasses = {
+            return []
+        }
+        application.metaClass.config =  new ConfigSlurper().parse("""
+            rabbitmq {
+                connectionfactory {
+                  jndiName='amqp/connectionFactory'
+                }
+
+                queues = {
+                   exchange name: 'it_jndi_topic', durable: true, type: topic, autoDelete: false, {
+                         it_q2 autoDelete: false, durable: true, binding: '#', arguments: ['x-ha-policy' : 'all']
+                   }
+                }
+            }
+        """)
+        def base = createPluginFileInstance(application)
+
+        // run a spring builder to create context
+        def bb = new BeanBuilder()
+        bb.beans base.doWithSpring
+        def ctx = bb.createApplicationContext()
+
+        // below proves that the jndi based CF works, they don't get created otherwise
+        // test topic
+        def itTopic = ctx.getBean("grails.rabbit.exchange.it_jndi_topic")
+        assertEquals(itTopic.getClass(), TopicExchange.class)
+        assertTrue(itTopic.durable)
+        assertFalse(itTopic.autoDelete)
+        assertEquals(itTopic.name, 'it_jndi_topic')
+        
+        // don't need it anymore
+        jndiBuilder.deactivate()
+    }
     void testQueueAndExchangeSetup() {
         // mock up test configuration
         def application = new Object()
