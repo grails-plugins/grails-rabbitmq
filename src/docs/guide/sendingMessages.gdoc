@@ -10,5 +10,4 @@ class MessageController {
 }
 {code}
 
-Messages may also be sent by interacting with the @RabbitTemplate@ Spring bean directly.  See the [Using The RabbitTemplate Directly|guide:5. Using The RabbitTemplate Directly] 
-section for more information.
+Messages may also be sent by interacting with the @RabbitTemplate@ Spring bean directly.  See the [Using The RabbitTemplate Directly|guide:rabbitTemplate] section for more information.

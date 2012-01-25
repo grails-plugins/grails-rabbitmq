@@ -1,0 +1,11 @@
+introduction: 1. Introduction To The RabbitMQ Plugin
+changeLog: 1.1 Change log
+configuration: 2. Configuration
+configuringQueues: 2.1 Configuring Queues
+configuringExchanges: 2.2 Configuring Exchanges
+sendingMessages: 3. Sending Messages
+consumingMessages: 4. Consuming Messages
+pubSub: 4.1 Pub-Sub
+manualQueueManagement: 4.2 Manual queue management
+messages: 4.3 Messages
+usingTheRabbitTemplateDirectly: 5. Using The RabbitTemplate Directly

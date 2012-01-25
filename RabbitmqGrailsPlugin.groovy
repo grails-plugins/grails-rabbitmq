@@ -31,10 +31,8 @@ class RabbitmqGrailsPlugin {
 
     def author = "Jeff Brown"
     def authorEmail = "jeff.brown@springsource.com"
-    def title = "Rabbit MQ"
-    def description = '''\\
-The Rabbit MQ plugin provides integration with the Rabbit MQ Messaging System.
-'''
+    def title = "RabbitMQ Plugin"
+    def description = "The RabbitMQ plugin provides integration with the RabbitMQ Messaging System."
 
     def license = "APACHE"
     def organization = [ name: "SpringSource", url: "http://www.springsource.org/" ]
