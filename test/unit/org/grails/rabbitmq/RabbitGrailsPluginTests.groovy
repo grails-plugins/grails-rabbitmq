@@ -162,14 +162,14 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
 
 }
 
-static class MockSubscribeService {
+class MockSubscribeService {
     static rabbitSubscribe = 'blueExchange'
     static transactional = false
     def propertyName
     def clazz = MockSubscribeService.class
 }
 
-static class MockQueueService {
+class MockQueueService {
     static rabbitQueue = 'blueQueue'
     static transactional = false
     def propertyName
