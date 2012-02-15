@@ -61,6 +61,8 @@ class RabbitmqGrailsPlugin {
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
         def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
 
+        def messageConverterBean = rabbitmqConfig.messageConverterBean
+
         if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
             log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
         } else {
@@ -82,6 +84,7 @@ class RabbitmqGrailsPlugin {
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
+                if (messageConverterBean) messageConverter = ref(messageConverterBean)
             }
             adm(RabbitAdmin, rabbitMQConnectionFactory)
             Set registeredServices = new HashSet()
@@ -220,12 +223,14 @@ class RabbitmqGrailsPlugin {
     }
 
     def doWithApplicationContext = { applicationContext ->
+        def rabbitTemplate = applicationContext.getBean('rabbitTemplate', RabbitTemplate.class)
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
         containerBeans.each { beanName, bean ->
             if(beanName.endsWith(LISTENER_CONTAINER_SUFFIX)) {
                 def adapter = new MessageListenerAdapter()
                 def serviceName = beanName - LISTENER_CONTAINER_SUFFIX
                 adapter.delegate = applicationContext.getBean(serviceName)
+                adapter.messageConverter = rabbitTemplate.messageConverter
                 bean.messageListener = adapter
                 
                 // Now that the listener is properly configured, we can start it.
