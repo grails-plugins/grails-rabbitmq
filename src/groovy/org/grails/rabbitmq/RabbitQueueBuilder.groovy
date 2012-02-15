@@ -52,6 +52,7 @@ class RabbitQueueBuilder {
             case FanoutExchange:
                 // Any binding will be ignored.
                 log.warn "'${currentExchange.name}' is a fanout exchange - binding for queue '${methodName}' ignored"
+                newBinding.rule = ""    // rabbit client API doesn't like a null binding
                 break
 
             case HeadersExchange:
