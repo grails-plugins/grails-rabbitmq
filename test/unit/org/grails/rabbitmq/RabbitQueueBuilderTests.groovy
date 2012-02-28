@@ -100,7 +100,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         assertEquals 'wrong number of bindings', 1, bindings?.size()
         assertEquals 'wrong exchange bound', 'my.fanout', bindings[0].exchange
         assertEquals 'wrong queue bound', 'foo', bindings[0].queue
-        assertNull 'binding is set', bindings[0].rule
+        assertEquals 'binding is set', '', bindings[0].rule
         assertNull 'no arguments expected', bindings[0].arguments
     }
 
