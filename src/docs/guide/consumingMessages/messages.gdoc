@@ -30,3 +30,23 @@ class DemoService {
 {code}
 
 This is a great convenience, but be aware that using serializable Java objects limits the types of client you can interact with. If all the clients you're interested in are using Spring AMQP, then you should be fine, but don't expect Ruby or Python clients to handle @Map@ messages! For production systems, we recommend you use strings and byte arrays.
+
+Sometimes you want access to the raw message, particularly if you want to look at the message headers. If so, just change the signature of the @handleMessage()@ method and add an extra option to your @rabbitQueue@ or @rabbitSubscribe@ property:
+
+{code}
+package org.grails.rabbitmq.test
+
+import org.springframework.amqp.core.Message
+
+class DemoService {
+    static rabbitQueue = [queues: 'someQueueName', messageConverterBean: '']
+
+    void handleMessage(Message msg) {
+        // Do something with the message headers
+        println "Received message with content type ${msg.contentType};${msg.encoding}"
+        ...
+    }
+}
+{code}
+
+As you can see, all you have to do is accept an argument of type @Message@ and add the @messageConverterBean@ option with an empty string as its value. This disables the automatic message conversion, allowing you to interrogate the raw message as required.

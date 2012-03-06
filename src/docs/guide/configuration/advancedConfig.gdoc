@@ -1,0 +1,56 @@
+When you need fine-grained control over your service listeners, you can tap into the power of Spring. Since each service listener is implemented as a set of Spring beans, you can use Grails' [bean property override|http://grails.org/doc/latest/guide/spring.html#propertyOverrideConfiguration] mechanism to provide your own low-level settings.
+
+So how are these beans set up? If a service has either a @rabbitQueue@ or @rabbitSubscribe@ property, then you will have these beans:
+
+* @<serviceName>_MessageListenerContainer@ of type [SimpleMessageListenerContainer|api:org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer]
+* @<serviceName>RabbitAdapter@ of type [MessageListenerAdapter|api:org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter]
+
+As an example, let's say you have a @MessageStoreService@ like so:
+
+{code}
+class MessageStoreService {
+    static rabbitSubscribe = [exchange: "amq.topic", routingKey: "logs.#"]
+    ...
+}
+{code}
+
+You can then customise things like the number of concurrent consumers, whether the channel is transacted, what the prefetch count should be, and more! Simply add code like this to your runtime configuration (Config.groovy):
+
+{code}
+beans {
+    messageStoreService_MessageListenerContainer {
+        channelTransacted = false
+        concurrentConsumers = 10
+        prefetchCount = 5
+        queueNames = ["q1", "q2"] as String[]
+    }
+
+    messageStoreServiceRabbitAdapter {
+        encoding = "UTF-8"
+        responseRoutingKey = "replyQueue"
+    }
+}
+{code}
+
+This approach works for any property that accepts a basic type. But what about bean references? In this case, you can't use the bean property overrides. Fortunately, the most common bean reference you are likely to want to override, the message converter, has a dedicated configuration option:
+
+{code}
+rabbitmq.messageConverterBean = "myCustomMessageConverter"
+{code}
+
+This is a global setting that accepts the name of a message converter bean. For the rare occasions that you need to override other bean references, you can declare your own @<serviceName>_MessageListenerContainer@ or @<serviceName>_RabbitAdapter@ beans in resources.groovy.
+
+Finally, you can override some of the global config options on a per-service basis:
+
+{code}
+rabbitmq {
+    services {
+        messageStoreService {
+            concurrentConsumers = 50
+            disableListening = true
+        }
+    }
+}
+{code}
+
+There are many options for customisation and we hope the above will get you started.

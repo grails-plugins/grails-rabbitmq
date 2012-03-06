@@ -68,6 +68,14 @@ This approach isn't limited to topic exchanges: you can automatically bind queue
 # the 'binding' is ignored for fanout exchanges; and
 # the headers exchange requires a map of message header names and values for its binding.
 
+{note}
+RabbitMQ has several built-in exchanges with names of the form 'amq.*', for example 'amq.direct'. If you want to bind to these, you currently have to declare them with the correct attributes, i.e.
+
+{code}
+exchange name: "amq.direct", type: direct, durable: true, autoDelete: false
+{code}
+{note}
+
 As you can imagine, these few building blocks allow you to configure some pretty complex messaging systems with very little effort. You can tailor the messaging system to your needs rather than tailor your applications to the messaging system.
 
 

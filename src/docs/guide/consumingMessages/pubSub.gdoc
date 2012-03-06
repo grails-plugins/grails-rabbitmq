@@ -40,3 +40,14 @@ In this example, the service will only receive messages that have a routing key 
 
 Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.
 
+The map syntax also allows you to customise the properties of the Spring message listener container and the corresponding listener adapter (see the section on [advanced configuration|guide:advancedConfig] for more details on these). For example,
+
+{code}
+static rabbitSubscribe = [
+        name: 'shares',
+        routingKey: 'NYSE.GE',
+        encoding: "ISO-8859-1",
+        prefetchCount: 1]
+{code}
+
+will set the encoding and prefetch count for just this service listener. This technique is also possible for straight queue listeners as well.

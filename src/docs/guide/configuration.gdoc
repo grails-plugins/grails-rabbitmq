@@ -22,5 +22,6 @@ rabbitmq.connectionfactory.password | The password for connection to the server 
 rabbitmq.connectionfactory.hostname | The host name of the server | (none) 
 rabbitmq.connectionfactory.virtualHost | The name of the virtual host to connect to | '/'
 rabbitmq.connectionfactory.channelCacheSize | The connection channel cache size | 10
-rabbitmq.concurrentConsumers | The number of concurrent consumers to create per message handler.  Raising the number is recommendable in order to scale the consumption of messages coming in from a queue.  Note that ordering guarantees are lost when multiple consumers are registered. | 1
+rabbitmq.concurrentConsumers | The number of concurrent consumers to create per message handler.  Raising the number is recommended in order to scale the consumption of messages coming in from a queue.  Note that ordering guarantees are lost when multiple consumers are registered. | 1
+rabbitmq.disableListening | Disables all service listeners so that they won't receive any messages. | false
 {table}

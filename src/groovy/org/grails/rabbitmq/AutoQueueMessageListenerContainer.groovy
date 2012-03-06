@@ -2,6 +2,7 @@ package org.grails.rabbitmq
 
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.BindingBuilder
+import org.springframework.amqp.core.DirectExchange
 import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.core.TopicExchange
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
@@ -51,10 +52,10 @@ class AutoQueueMessageListenerContainer extends SimpleMessageListenerContainer i
 
         def binding = null
         if (exchange instanceof FanoutExchange) {
-            binding = BindingBuilder.bind(queue).to((FanoutExchange)exchange);
+            binding = BindingBuilder.bind(queue).to(exchange);
         }
-        else if (exchange instanceof TopicExchange) {
-            binding = BindingBuilder.bind(queue).to((TopicExchange)exchange).with(routingKey);
+        else if (exchange instanceof DirectExchange || exchange instanceof TopicExchange) {
+            binding = BindingBuilder.bind(queue).to(exchange).with(routingKey);
         }
         else {
             log.error "Cannot subscribe to an exchange ('${exchange.name}') that is neither a fanout nor a topic"

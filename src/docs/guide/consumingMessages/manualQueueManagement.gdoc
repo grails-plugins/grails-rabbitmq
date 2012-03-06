@@ -15,4 +15,12 @@ class DemoService {
 
 As with the pub/sub model, messages are delivered to the service by invoking the @handleMessage()@ method. That's all there is to it! The real trick is to configure your exchanges and queues with appropriate bindings, as we described in the configuration section.
 
+If you want more say in the configuration of the underlying listener, then you can also specify a map:
+
+{code}
+static rabbitQueue = [queues: "someQueueName", channelTransacted: true]
+{code}
+
+The "queues" option can either be a simple queue name or a list of queue names. Again, have a look at the [advanced configuration section|guide:advancedConfig] for information about the extra properties you can set here.
+
 One last subject to discuss is the form that the messages take.
