@@ -21,7 +21,7 @@ rabbitSend "prices", "shares.NYSE.GE", "$354.23"
 
 h2. Description
 
-The @rabbitSend()@ method is basically a convenience over the [Spring AMQP convertAndSend()|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/htmlsingle/#d0e335] method. It has three basic forms:
+The @rabbitSend()@ method is basically a convenience over the [Spring AMQP convertAndSend()|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e462] method. It has three basic forms:
 
 {code}
 rabbitSend message

@@ -1,8 +1,4 @@
-Most of the interaction with the RabbitMQ server is being handled by an instance of 
-@org.springframework.amqp.rabbit.core.RabbitTemplate@.  For many applications this is
-happening at a lower level than the application needs to be concerned with.  The plugin
-does provide a Spring bean to the application context that is an instance of the
-@RabbitTemplate@ class which may be used directly.  The bean name is @rabbitTemplate@.
+Most of the interaction with the RabbitMQ server is being handled by an instance of [RabbitTemplate|api:org.springframework.amqp.rabbit.core.RabbitTemplate]. For many applications this is happening at a lower level than the application needs to be concerned with. The plugin does provide a Spring bean to the application context that is an instance of the @RabbitTemplate@ class which may be used directly. The bean name is @rabbitTemplate@.
 
 {code}
 class MessageController {
@@ -15,6 +11,3 @@ class MessageController {
     }
 }
 {code}
-
-The full API of the @RabbitTemplate@ class is documented in 
-[The Spring AMQP API Docs|http://static.springsource.org/spring-amqp/docs/1.0.x/api/].

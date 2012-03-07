@@ -1,6 +1,6 @@
 What is a message? In the examples you've seen in this section, the message has been some arbitrary object but we haven't discussed what the type of that object might be. That's because, it can be pretty much anything! Within the messaging system, the content of a message is simply a byte array - it's up to the producer can consumer to interpret/convert that raw data.
 
-Fortunately the plugin (via [Spring AMQP|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/htmlsingle/#d0e335]) automatically handles messages whose content is in familiar forms, including:
+Fortunately the plugin (via [Spring AMQP|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e335]) automatically handles messages whose content is in familiar forms, including:
 
 * strings
 * byte arrays
