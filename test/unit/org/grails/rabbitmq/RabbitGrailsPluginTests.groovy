@@ -112,13 +112,13 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
 
         def bb = new BeanBuilder()
         bb.beans {
-            'pinkService'(MockQueueService) {
+            pinkService(MockQueueService) {
                 propertyName = 'pinkService'
             }
-            'blueService'(MockQueueService) {
+            blueService(MockQueueService) {
                 propertyName = 'blueService'
             }
-            'tealService'(MockQueueService) {
+            tealService(MockQueueService) {
                 propertyName = 'tealService'
             }
         }
