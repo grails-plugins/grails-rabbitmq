@@ -77,14 +77,15 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
     }
 
     void testServiceDisabling() {
-        def blueService = new MockQueueService(propertyName: 'blueService')
-        def pinkService = new MockQueueService(propertyName: 'pinkService')
-        def redService = new MockSubscribeService(propertyName: 'redService')
-        def tealService = new MockSubscribeService(propertyName: 'tealService')
+        def mockBlueService = new MockQueueService(propertyName: 'blueService')
+        def mockPinkService = new MockQueueService(propertyName: 'pinkService')
+        def mockRedService = new MockSubscribeService(propertyName: 'redService')
+        def mockTealService = new MockSubscribeService(propertyName: 'tealService')
 
         def application = new Object()
+        
         application.metaClass.getServiceClasses = {
-            return [blueService, redService, pinkService, tealService]
+            return [mockBlueService, mockRedService, mockPinkService, mockTealService]
         }
 
         application.metaClass.config = new ConfigSlurper().parse("""
@@ -110,6 +111,17 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
         def base = createPluginFileInstance(application)
 
         def bb = new BeanBuilder()
+        bb.beans {
+            'pinkService'(MockQueueService) {
+                propertyName = 'pinkService'
+            }
+            'blueService'(MockQueueService) {
+                propertyName = 'blueService'
+            }
+            'tealService'(MockQueueService) {
+                propertyName = 'tealService'
+            }
+        }
         bb.beans base.doWithSpring
         def ctx = bb.createApplicationContext()
 
