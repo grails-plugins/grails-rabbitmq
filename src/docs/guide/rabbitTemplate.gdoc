@@ -1,0 +1,13 @@
+Most of the interaction with the RabbitMQ server is being handled by an instance of [RabbitTemplate|api:org.springframework.amqp.rabbit.core.RabbitTemplate]. For many applications this is happening at a lower level than the application needs to be concerned with. The plugin does provide a Spring bean to the application context that is an instance of the @RabbitTemplate@ class which may be used directly. The bean name is @rabbitTemplate@.
+
+{code}
+class MessageController {
+    
+    def rabbitTemplate
+    
+    def sendMessage = {
+        rabbitTemplate.convertAndSend('someQueueName', 'someMessage)
+        ...
+    }
+}
+{code}

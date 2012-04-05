@@ -1,0 +1,5 @@
+1.%20Introduction%20To%20The%20RabbitMQ%20Plugin.html -> introductionToTheRabbitMQPlugin.html
+2.%20Configuration.html -> configuration.html
+3.%20Sending%20Messages.html -> sendingMessages.html
+4.%20Consuming%20Messages.html -> consumingMessages.html
+5.%20Using%20The%20RabbitTemplate%20Directly.html -> usingTheRabbitTemplateDirectly.html

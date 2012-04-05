@@ -1,0 +1,18 @@
+h3. Version 0.3.2 - 16 Mar 2011
+
+* Upgrade to Spring AMQP 1.0.0.M3
+
+h3. Version 0.3.1 - 14 Feb 2011
+
+* spring-core dependency now excluded
+* Corrected the SCM and documentation URLs in the plugin descriptor
+
+h3. Version 0.3 - 7 Feb 2011
+
+* Upgraded to Spring AMQP 1.0.0 M2
+* Added transaction support
+* Added support for pub/sub model
+* Applications can now configure exchanges and bindings in addition to queues
+* Applications can now connect to any virtual host, not just '/'
+* Bug fixes:
+** [GRAILSPLUGINS-2496|http://jira.codehaus.org/browse/GRAILSPLUGINS-2496] - Messages are now picked up when the application starts

@@ -1,0 +1,81 @@
+Queues are the foundation of consuming messages, but what if you want to send messages? In AMQP, you send messages to an exchange and the exchange then routes those messages to the appropriate queues based on something called a binding. The key to setting up complex messaging systems lies in configuring these exchanges and queues appropriately.
+
+h3. Declaring an exchange
+
+Let's start with an example of how to set up a simple exchange (with no queues):
+
+{code}
+rabbitmq {
+    connectionFactory {
+        ...
+    }
+    queues = {
+        exchange name: 'my.topic', type: topic
+    }
+}
+{code}
+
+As you can probably guess, this will create a topic exchange with the name 'my.topic'. There are two things to note at this point:
+
+# the name and type are required
+# the type value is _not_ a string literal
+
+So what types are available to you?
+
+{table}
+*Type* | *Description*
+direct | An exchange that only routes messages that are bound to it with a key that matches the routing key of the message exactly. Typically this exchange is used for point-to-point messaging and the routing key is the queue name.
+fanout | Sends messages to all queues bound to it. It basically does a broadcast.
+topic | Similar to the @fanout@ exchange, this routes messages to the queues bound to it, but only queues whose binding matches a message's routing key will receive that message. Wildcards are supported in the binding.
+headers | Similar to topic, but messages can be filtered by other any message header, not just the routing key.
+{table}
+
+The exchange declaration also supports a couple of extra options that should be familiar from the queue declarations:
+
+{table}
+*Option* | *Description*
+autoDelete | If @true@, the exchange will be removed from the broker when there are no more queues bound to it. Note that this doesn't take effect until at least one queue is bound to the exchange.
+durable | If @true@, the exchange will survive a restart of the broker.
+{table}
+
+With the above syntax, it is up to you to bind queues to the exchange via another AMQP client or via the RabbitMQ management interface. In other words, this is most suitable if your Grails application is purely a publisher of messages and not a consumer (or at least not a consumer of 'my.topic' messages).
+
+What if you want to create queues and automatically bind them to the exchange? Don't worry, that's supported by the configuration DSL too.
+
+h3. Binding queues to exchanges
+
+An exchange on its own isn't particularly useful, but we can easily bind queues to it by declaring them as nested entries:
+
+{code}
+rabbitmq {
+    connectionFactory {
+        ...
+    }
+    queues = {
+        exchange name: 'my.topic', type: topic, durable: false, {
+            foo durable: true, binding: 'shares.#'
+            bar durable: false, autoDelete: true, binding: 'shares.nyse.?'
+        }
+    }
+}
+{code}
+
+In the example above, we bind two queues ('foo' and 'bar') to the exchange 'my.topic'. Since this is a topic exchange, we can use a binding key to filter which messages go from 'my.topic' to each queue. So in this case, only messages with a routing key beginning with 'shares.' will end up on the 'foo' queue. 'bar' will only receive messages whose routing key begins with 'shares.nyse.'.
+
+This approach isn't limited to topic exchanges: you can automatically bind queues to any exchange type. There are a few things to bear in mind though:
+
+# the default binding for direct exchanges is the queue name (unless this is explicitly overridden by a 'binding' option);
+# the 'binding' is ignored for fanout exchanges; and
+# the headers exchange requires a map of message header names and values for its binding.
+
+{note}
+RabbitMQ has several built-in exchanges with names of the form 'amq.*', for example 'amq.direct'. If you want to bind to these, you currently have to declare them with the correct attributes, i.e.
+
+{code}
+exchange name: "amq.direct", type: direct, durable: true, autoDelete: false
+{code}
+{note}
+
+As you can imagine, these few building blocks allow you to configure some pretty complex messaging systems with very little effort. You can tailor the messaging system to your needs rather than tailor your applications to the messaging system.
+
+

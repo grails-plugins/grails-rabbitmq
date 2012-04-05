@@ -1,15 +1,30 @@
-import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
+import org.aopalliance.aop.Advice
+import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
+import org.grails.rabbitmq.AutoQueueMessageListenerContainer
+import org.grails.rabbitmq.RabbitConfigurationHolder
+import org.grails.rabbitmq.RabbitDynamicMethods
+import org.grails.rabbitmq.RabbitErrorHandler
 import org.grails.rabbitmq.RabbitQueueBuilder
+import org.grails.rabbitmq.RabbitServiceConfigurer
+import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
+import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
+import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.support.converter.SimpleMessageConverter
+import org.springframework.retry.backoff.FixedBackOffPolicy
+import org.springframework.retry.policy.SimpleRetryPolicy
+import org.springframework.retry.support.RetryTemplate
+import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
+
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "0.2"
+    def version = "1.0.0.RC1"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3 > *"
+    def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
@@ -25,36 +40,44 @@ class RabbitmqGrailsPlugin {
 
     def author = "Jeff Brown"
     def authorEmail = "jeff.brown@springsource.com"
-    def title = "Rabbit MQ"
-    def description = '''\\
-The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
-'''
+    def title = "RabbitMQ Plugin"
+    def description = "The RabbitMQ plugin provides integration with the RabbitMQ Messaging System."
+
+    def license = "APACHE"
+    def organization = [ name: "SpringSource", url: "http://www.springsource.org/" ]
+    def developers = [ [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ] ]
+    def issueManagement = [ system: "JIRA", url: "http://jira.codehaus.org/browse/GRAILSPLUGINS" ]
+    def scm = [ url: "https://github.com/grails-plugins/grails-rabbitmq" ]
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/rabbitmq"
+    def documentation = "http://grails-plugins.github.com/grails-rabbitmq/"
     
     def loadAfter = ['services']
     def observe = ['*']
 
-    private static LISTENER_CONTAINER_SUFFIX = '_MessageListenerContainer'
-
     def doWithSpring = { 
-        
-        def connectionFactoryConfig = application.config.rabbitmq?.connectionfactory
+
+        def rabbitmqConfig = application.config.rabbitmq
+        def configHolder = new RabbitConfigurationHolder(rabbitmqConfig)
+
+        def connectionFactoryConfig = rabbitmqConfig?.connectionfactory
         
         def connectionFactoryUsername = connectionFactoryConfig?.username
         def connectionFactoryPassword = connectionFactoryConfig?.password
+        def connectionFactoryVirtualHost = connectionFactoryConfig?.virtualHost
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
         def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
-        def connectionFactoryConsumers = application.config.rabbitmq?.concurrentConsumers ?: 1
-        
+
+        def messageConverterBean = rabbitmqConfig.messageConverterBean
+
         if(!connectionFactoryUsername || !connectionFactoryPassword || !connectionFactoryHostname) {
             log.error 'RabbitMQ connection factory settings (rabbitmq.connectionfactory.username, rabbitmq.connectionfactory.password and rabbitmq.connectionfactory.hostname) must be defined in Config.groovy'
         } else {
           
-            log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${connectionFactoryConsumers} consumers."
+            log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${configHolder.getDefaultConcurrentConsumers()} consumers."
           
-            def connectionFactoryClassName = connectionFactoryConfig?.className ?: 'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
+            def connectionFactoryClassName = connectionFactoryConfig?.className ?:
+                    'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
             def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
@@ -62,79 +85,172 @@ The Rabbit MQ plugin provides integration with  the Rabbit MQ Messaging System.
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
                 channelCacheSize = connectionChannelCacheSize
+
+                if (connectionFactoryVirtualHost) {
+                    virtualHost = connectionFactoryVirtualHost
+                }
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
+                if (messageConverterBean) {
+                     messageConverter = ref(messageConverterBean)
+                 } else {
+                     def converter = new SimpleMessageConverter()
+                     converter.createMessageIds = true
+                     messageConverter = converter
+                 }
             }
-            adm(org.grails.rabbitmq.GrailsRabbitAdmin, rabbitMQConnectionFactory)
-            application.serviceClasses.each { service ->
-                
-                def serviceClass = service.clazz
-                def propertyName = service.propertyName
-        
-                def rabbitQueue = GCU.getStaticPropertyValue(serviceClass, 'rabbitQueue')
-                
-                if(rabbitQueue) { 
-                    "${propertyName}${LISTENER_CONTAINER_SUFFIX}"(SimpleMessageListenerContainer) {
-                        connectionFactory = rabbitMQConnectionFactory
-                        queueName = rabbitQueue
-                        concurrentConsumers = connectionFactoryConsumers
-                    }
-                }
-            }
+            adm(RabbitAdmin, rabbitMQConnectionFactory)
+            rabbitErrorHandler(RabbitErrorHandler)
 
+            // Add beans to hook up services as AMQP listeners.
+            Set registeredServices = new HashSet()
+            for(service in application.serviceClasses) {
+                def serviceConfigurer = new RabbitServiceConfigurer(service, rabbitmqConfig)
+                if(!serviceConfigurer.isListener() || !configHolder.isServiceEnabled(service)) continue
+
+                def propertyName = service.propertyName
+                if(!registeredServices.add(propertyName)) {
+                    throw new IllegalArgumentException(
+                            "Unable to initialize rabbitmq listeners properly." +
+                            " More than one service named ${propertyName}.")
+                }
+
+                serviceConfigurer.configure(delegate)
+            }
+            
             def queuesConfig = application.config.rabbitmq?.queues
             if(queuesConfig) {
                 def queueBuilder = new RabbitQueueBuilder()
+                queuesConfig = queuesConfig.clone()
                 queuesConfig.delegate = queueBuilder
+                queuesConfig.resolveStrategy = Closure.DELEGATE_FIRST
                 queuesConfig()
-                def queues = queueBuilder.queues
-                if(queues) {
-                    queues.each { queue ->
-                        "grails.rabbit.queue.${queue.name}"(Queue, queue.name) {
-                            durable = queue.durable
-                            autoDelete = queue.autoDelete
-                            exclusive = queue.exclusive
-                            arguments = queue.arguments
-                        }
+                
+                // Deal with declared exchanges first.
+                queueBuilder.exchanges?.each { exchange ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering exchange '${exchange.name}'"
+                    }
+
+                    "grails.rabbit.exchange.${exchange.name}"(exchange.type, exchange.name,
+                            Boolean.valueOf(exchange.durable),
+                            Boolean.valueOf(exchange.autoDelete),
+                            exchange.arguments)
+                }
+                
+                // Next, the queues.
+                queueBuilder.queues?.each { queue ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering queue '${queue.name}'"
+                    }
+
+                    "grails.rabbit.queue.${queue.name}"(Queue, queue.name,
+                            Boolean.valueOf(queue.durable),
+                            Boolean.valueOf(queue.exclusive),
+                            Boolean.valueOf(queue.autoDelete),
+                            queue.arguments,
+                    )
+                }
+                
+                // Finally, the bindings between exchanges and queues.
+                queueBuilder.bindings?.each { binding ->
+                    if (log.debugEnabled) {
+                        log.debug "Registering binding between exchange '${binding.exchange}' & queue '${binding.queue}'"
+                    }
+                    
+                    def args = [ ref("grails.rabbit.exchange.${binding.exchange}"), ref ("grails.rabbit.queue.${binding.queue}") ]
+                    if (binding.rule) {
+                        log.debug "Binding with rule '${binding.rule}'"
+
+                        // Support GString and String for the rule. Other types of rule (Map
+                        // is the only valid option atm) are passed through as is.
+                        args << (binding.rule instanceof CharSequence ? binding.rule.toString() : binding.rule)
+                    }
+
+                    "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
+                }
+            }
+            rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
+                def retryPolicy = new SimpleRetryPolicy()
+                def maxRetryAttempts = 0
+                if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
+                    def maxAttemptsConfigValue = rabbitmqConfig.retryPolicy.maxAttempts
+                    if(maxAttemptsConfigValue instanceof Integer) {
+                        maxRetryAttempts = maxAttemptsConfigValue
+                    } else {
+                        log.error "rabbitmq.retryPolicy.maxAttempts [$maxAttemptsConfigValue] of type [${maxAttemptsConfigValue.getClass().getName()}] is not an Integer and will be ignored.  The default value of [${maxRetryAttempts}] will be used"
                     }
                 }
+                retryPolicy.maxAttempts = maxRetryAttempts
+                
+                def backOffPolicy = new FixedBackOffPolicy()
+                backOffPolicy.backOffPeriod = 5000
+                
+                def retryTemplate = new RetryTemplate()
+                retryTemplate.retryPolicy  = retryPolicy
+                retryTemplate.backOffPolicy = backOffPolicy
+                
+                retryOperations = retryTemplate
             }
         }   
     }
     
     def doWithDynamicMethods = { appCtx ->
-        addDynamicMessageSendingMessages application.allClasses, appCtx
+        addDynamicMessageSendingMethods application.allClasses, appCtx
     }
     
-    private addDynamicMessageSendingMessages(classes, ctx) {
+    private addDynamicMessageSendingMethods(classes, ctx) {
         if(ctx.rabbitMQConnectionFactory) {
             classes.each { clz ->
-                clz.metaClass.rabbitSend = { Object[] args ->
-                    if(args[-1] instanceof GString) { 
-                        args[-1] = args[-1].toString()
-                    }
-                    ctx.rabbitTemplate.convertAndSend(*args)
-                }
+                RabbitDynamicMethods.applyAllMethods(clz, ctx)
             }
         }
     }
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
+        applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
         containerBeans.each { beanName, bean ->
-            if(beanName.endsWith(LISTENER_CONTAINER_SUFFIX)) {
-                def adapter = new MessageListenerAdapter()
-                def serviceName = beanName - LISTENER_CONTAINER_SUFFIX
-                adapter.delegate = applicationContext.getBean(serviceName)
-                bean.messageListener = adapter
+            if(isServiceListener(beanName)) {
+                bean.adviceChain = [applicationContext.rabbitRetryHandler] as Advice[]
+                // Now that the listener is properly configured, we can start it.
+                bean.start()
             }
         }
     }
     
     def onChange = { evt ->
         if(evt.source instanceof Class) {
-            addDynamicMessageSendingMessages ([evt.source], evt.ctx)
+            addDynamicMessageSendingMethods ([evt.source], evt.ctx)
+            
+            // If a service has changed, reload the associated beans
+            if(isServiceEventSource(application, evt.source)) {
+                def serviceGrailsClass = application.addArtefact(ServiceArtefactHandler.TYPE, evt.source)
+                def serviceConfigurer = new RabbitServiceConfigurer(
+                        serviceGrailsClass,
+                        application.config.rabbitmq)
+                if (serviceConfigurer.isListener()) {
+                    def beans = beans {
+                        serviceConfigurer.configure(delegate)
+                    }
+                    beans.registerBeans(evt.ctx)
+                    startServiceListener(serviceGrailsClass.propertyName, evt.ctx)
+                }
+            } 
         }
+    }
+
+    protected isServiceListener(beanName) {
+        return beanName.endsWith(RabbitServiceConfigurer.LISTENER_CONTAINER_SUFFIX)
+    }
+
+    protected isServiceEventSource(application, source) {
+        return application.isArtefactOfType(ServiceArtefactHandler.TYPE, source)
+    }
+
+    protected startServiceListener(servicePropertyName, applicationContext) {
+        def beanName = servicePropertyName + RabbitServiceConfigurer.LISTENER_CONTAINER_SUFFIX
+        applicationContext.getBean(beanName).start()
     }
 }

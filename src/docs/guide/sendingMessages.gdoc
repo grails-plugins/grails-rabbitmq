@@ -1,0 +1,13 @@
+The plugin adds a method named @rabbitSend@ to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The @rabbitSend@ method accepts 2 parameters. The first parameter is a queue name and the second parameter is the message being sent.
+
+{code}
+class MessageController {
+    
+    def sendMessage = {
+        rabbitSend 'someQueueName', 'someMessage'
+        ...
+    }
+}
+{code}
+
+Messages may also be sent by interacting with the @RabbitTemplate@ Spring bean directly.  See the [Using The RabbitTemplate Directly|guide:rabbitTemplate] section for more information.

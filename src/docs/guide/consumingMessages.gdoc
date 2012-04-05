@@ -1,0 +1,6 @@
+The plugin provides two simple ways of consuming messages:
+
+# from a named Queue
+# by subscribing to an exchange (the traditional pub/sub model)
+
+Which approach you take depends on whether you want to implement the pub/sub messaging model and how much control you need.

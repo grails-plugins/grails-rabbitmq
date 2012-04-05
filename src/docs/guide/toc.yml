@@ -1,0 +1,15 @@
+introduction: 
+  title: Introduction To The RabbitMQ Plugin
+  changeLog: Change log
+configuration: 
+  title: Configuration
+  configuringQueues: Configuring Queues
+  configuringExchanges: Configuring Exchanges
+  advancedConfig: Advanced Configuration
+sendingMessages: Sending Messages
+consumingMessages: 
+  title: Consuming Messages
+  pubSub: Pub-Sub
+  manualQueueManagement: Manual queue management
+  messages: Messages
+rabbitTemplate: Using The RabbitTemplate Directly

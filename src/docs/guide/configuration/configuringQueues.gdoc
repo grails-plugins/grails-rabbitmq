@@ -1,0 +1,47 @@
+Queues must be declared in the RabbitMQ server before consumers can be associated with those queues and before messages may be sent to those queues. If the Grails application will be sending messages to or receiving messages from queues that may not already be declared in the RabbitMQ server, the application needs to declare those queues up front. One way to do that is to add beans to the Spring application context of type @org.springframework.amqp.core.Queue@. That 
+might look something like this:
+
+{code}
+// grails-app/conf/spring/resources.groovy
+beans = {
+    myQueue(org.springframework.amqp.core.Queue, 'myQueueName') 
+    myOtherQueue(org.springframework.amqp.core.Queue, 'myOtherQueueName') {
+        autoDelete = false
+        durable = true
+        exclusive = false
+        arguments = [arg1: 'val1', arg2: 'val2']
+    }
+}
+{code}
+
+The plugin also supports a DSL for describing these queues. This DSL is expressed in @grails-app/conf/Config.groovy@. The code below configures the same queues as the previous code sample.
+
+{code}
+// grails-app/conf/Config.groovy
+rabbitmq {
+    connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+    }
+    queues = {
+        myQueueName()
+        myOtherQueueName autoDelete: false, durable: true, exclusive: false, arguments: [arg1: 'val1', arg2: 'val2']
+    }
+}
+{code}
+
+{note}
+With both techniques, the @autoDelete@, @durable@ and @exclusive@ attributes default to @false@ and the @arguments@ attribute defaults to null.
+{note}
+
+So what do those queue options mean?
+
+{table}
+*Option* | *Description*
+autoDelete | If @true@, the queue will be removed from the broker when there are no more clients attached to it. Note that this doesn't take effect until after at least one client connects to the queue.
+durable | If @true@, the queue will survive a restart of the broker.
+exclusive | Only the client that created the queue can connect to it.
+{table}
+
+One final thing: when you declare a standalone queue like this, it automatically gets bound to the broker's default exchange, which has an implicit name of '', i.e. the empty string. You can easily send messages to this queue via the [rabbitSend|allClasses] method.

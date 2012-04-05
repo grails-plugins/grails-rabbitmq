@@ -1,0 +1,53 @@
+One of the most common messaging models people use involves a producer broadcasting messages to all registered listeners (or more accurately, consumers). This is known as the publish/subscribe model, or pub/sub for short. There are two steps to getting this set up in Grails:
+
+# create the exchange you're going to publish messages to
+# create some consumers that subscribe to that exchange
+
+The first step can be done either outside of the Grails application or in the plugin's configuration. If the Grails application is the publisher, then it makes sense to declare the exchange in @grails-app/conf/Config.groovy@.
+
+The second step is dead easy with the plugin: create a service with a static @rabbitSubscribe@ property and a @handleMessage()@ method. Here's an example:
+
+{code}
+package org.example
+
+class SharesService {
+    static rabbitSubscribe = 'shares'
+
+    void handleMessage(message) {
+        // handle message...
+    }
+}
+{code}
+
+As long as the broker contains an exchange with the name @shares@, the @SharesService@ will receive all messages sent to that exchange. Every time a message is received from the broker, the service's @handleMessage()@ method is called with the message as its argument. We'll talk more about messages shortly.
+
+{note}
+The @rabbitSubscribe@ option only makes sense when applied to fanout and topic exchanges.
+{note}
+
+In the case of a topic exchange, you can filter messages based on the routing key. By default your service will receive all messages, but you can override this with an alternative syntax for @rabbitSubscribe@:
+
+{code}
+package org.example
+
+class SharesService {
+    static rabbitSubscribe = [ name: 'shares', routingKey: 'NYSE.GE' ]
+    ...
+}
+{code}
+
+In this example, the service will only receive messages that have a routing key of 'GE'. Of course, you can use standard AMQP wildcards too like 'NYSE.#', which will match all messages with a routing key that starts with 'NYSE.'.
+
+Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.
+
+The map syntax also allows you to customise the properties of the Spring message listener container and the corresponding listener adapter (see the section on [advanced configuration|guide:advancedConfig] for more details on these). For example,
+
+{code}
+static rabbitSubscribe = [
+        name: 'shares',
+        routingKey: 'NYSE.GE',
+        encoding: "ISO-8859-1",
+        prefetchCount: 1]
+{code}
+
+will set the encoding and prefetch count for just this service listener. This technique is also possible for straight queue listeners as well.

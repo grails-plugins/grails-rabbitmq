@@ -1,0 +1,36 @@
+h1. rabbitSend
+
+h2. Purpose
+
+Sends a message to a RabbitMQ broker.
+
+h2. Examples
+
+{code}
+// Send a string message to the default direct exchange. It will be routed to any
+// queues that are bound to the default exchange with the key '' (an empty string).
+rabbitSend "Some message"
+
+// Send a map message to the default direct exchange. The message will be routed to
+// the queue with the name 'myQueue'.
+rabbitSend "myQueue", [cmd: "addBook", title: "The Shining", author: "Stephen King"]
+
+// Send a string message to a 'prices' exchange with a routing key of 'shares.NYSE.GE'.
+rabbitSend "prices", "shares.NYSE.GE", "$354.23"
+{code}
+
+h2. Description
+
+The @rabbitSend()@ method is basically a convenience over the [Spring AMQP convertAndSend()|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e462] method. It has three basic forms:
+
+{code}
+rabbitSend message
+rabbitSend routingKey, message
+rabbitSend exchangeName, routingKey, message
+{code}
+
+If @routingKey@ is left out, it defaults to a value of '', i.e. the empty string. The same goes for @exchangeName@, in which case the message is routed to the queue with the same name as the routing key (if specified).
+
+The message can be any serializable type, although if you want to interoperate with non-Java clients, it's best to stick to string and byte array messages.
+
+For complex requirements, you can even pass in an object that processes the message after construction. See the Spring AMQP guide for more information on that.

@@ -1,0 +1,52 @@
+What is a message? In the examples you've seen in this section, the message has been some arbitrary object but we haven't discussed what the type of that object might be. That's because, it can be pretty much anything! Within the messaging system, the content of a message is simply a byte array - it's up to the producer can consumer to interpret/convert that raw data.
+
+Fortunately the plugin (via [Spring AMQP|http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e335]) automatically handles messages whose content is in familiar forms, including:
+
+* strings
+* byte arrays
+* maps
+* other serializable types
+
+One manifestation of this support is that different message types may be handled with overloaded versions of @handleMessage()@:
+
+{code}
+package org.grails.rabbitmq.test
+
+class DemoService {
+    static rabbitQueue = 'someQueueName'
+
+    void handleMessage(String textMessage) {
+        // handle String message...
+    }
+    
+    void handleMessage(Map mapMessage) {
+        // handle Map message...
+    }
+    
+    void handleMessage(byte[] byteMessage) {
+        // handle byte array message...
+    }
+}
+{code}
+
+This is a great convenience, but be aware that using serializable Java objects limits the types of client you can interact with. If all the clients you're interested in are using Spring AMQP, then you should be fine, but don't expect Ruby or Python clients to handle @Map@ messages! For production systems, we recommend you use strings and byte arrays.
+
+Sometimes you want access to the raw message, particularly if you want to look at the message headers. If so, just change the signature of the @handleMessage()@ method and add an extra option to your @rabbitQueue@ or @rabbitSubscribe@ property:
+
+{code}
+package org.grails.rabbitmq.test
+
+import org.springframework.amqp.core.Message
+
+class DemoService {
+    static rabbitQueue = [queues: 'someQueueName', messageConverterBean: '']
+
+    void handleMessage(Message msg) {
+        // Do something with the message headers
+        println "Received message with content type ${msg.contentType};${msg.encoding}"
+        ...
+    }
+}
+{code}
+
+As you can see, all you have to do is accept an argument of type @Message@ and add the @messageConverterBean@ option with an empty string as its value. This disables the automatic message conversion, allowing you to interrogate the raw message as required.

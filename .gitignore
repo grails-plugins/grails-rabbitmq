@@ -1,6 +1,7 @@
+.settings/
 stacktrace.log
 plugin.xml
-grails-rabbitmq-*.zip
+grails-rabbitmq-*.zip*
 target
-test/projects/
-.settings/
+web-app/WEB-INF/classes/
+
