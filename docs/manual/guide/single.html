@@ -1,35 +1,118 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>RabbitMQ Plugin 0.3 - Reference Documentation</title>
-        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Style" charset="utf-8"/>
+        <title>RabbitMQ Plugin 1.0.0.RC1</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
         <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <script type="text/javascript">
+function addJsClass(el) {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
     </head>
-    <body class="body">
+
+    <body class="body" onload="addJsClass();">
+        <div id="navigation">
+            <ul>
+                <li>
+                    <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                        <a href="../guide/index.html" class="button">Table of contents</a>
+                        <div id="nav-summary-childs" style="display:none;">
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="#configuration"><strong>2</strong><span>Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="#sendingMessages"><strong>3</strong><span>Sending Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="#consumingMessages"><strong>4</strong><span>Consuming Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="#rabbitTemplate"><strong>5</strong><span>Using The RabbitTemplate Directly</span></a></div>
+                            
+                        </div>
+                    </div>
+                </li>
+                <li class="separator selected">
+                    <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+                </li>
+            </ul>
+        </div>
         <div id="header">
-            <div class="images"><br/><br/>
-                <a href="http://grails.org" target="_blank"><img alt="The Grails Framework" src="../img/grails.png" border="0"/></a>
-                <span style="right:30px; top:20px; position:absolute;">
-                    <a href="../index.html" target="_top">Frames</a> | <a href="index.html" target="_top">No Frames</a><br/><br/>
-                    <a href="http://springsource.com" target="_blank"><img alt="SpringSource - A Division of VMware" src="../img/springsource-logo.png" border="0"/></a>
-                </span>
+            <div class="images clearfix">
+                
+                
             </div>
-            <div class="message">rabbitmq</div>
-            <h1>RabbitMQ Plugin - Reference Documentation</h1>
-            <p><strong>Authors:</strong> Jeff Brown, Peter Ledbrook</p>
-            <p><strong>Version:</strong> 0.3</p>
-            <em></em>
+            <p>The RabbitMQ plugin provides integration with the RabbitMQ Messaging System.</p>
         </div>
 
-        <div id="toc">
-            <h2>Table of Contents</h2>
-            <div class="tocItem" style="margin-left:0px"><a href="#1. Introduction To The RabbitMQ Plugin">1. Introduction To The RabbitMQ Plugin</a></div><div class="tocItem" style="margin-left:10px"><a href="#1.1 Change log">1.1 Change log</a></div><div class="tocItem" style="margin-left:0px"><a href="#2. Configuration">2. Configuration</a></div><div class="tocItem" style="margin-left:10px"><a href="#2.1 Configuring Queues">2.1 Configuring Queues</a></div><div class="tocItem" style="margin-left:10px"><a href="#2.2 Configuring Exchanges">2.2 Configuring Exchanges</a></div><div class="tocItem" style="margin-left:0px"><a href="#3. Sending Messages">3. Sending Messages</a></div><div class="tocItem" style="margin-left:0px"><a href="#4. Consuming Messages">4. Consuming Messages</a></div><div class="tocItem" style="margin-left:10px"><a href="#4.1 Pub-Sub">4.1 Pub-Sub</a></div><div class="tocItem" style="margin-left:10px"><a href="#4.2 Manual queue management">4.2 Manual queue management</a></div><div class="tocItem" style="margin-left:10px"><a href="#4.3 Messages">4.3 Messages</a></div><div class="tocItem" style="margin-left:0px"><a href="#5. Using The RabbitTemplate Directly">5. Using The RabbitTemplate Directly</a></div>
-        </div>
-        <div id="content">
-            <h1><a name="1. Introduction To The RabbitMQ Plugin">1. Introduction To The RabbitMQ Plugin</a></h1>The RabbitMQ plugin provides integration with the RabbitMQ highly reliable enterprise messaging system.  The
+
+        <table id="colset" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td id="col1">
+                    <div id="main" class="corner-all">
+
+                        <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                        <div class="project">
+                            <h1>RabbitMQ Plugin - Reference Documentation</h1>
+                            <p><strong>Authors:</strong> Jeff Brown, Peter Ledbrook</p>
+                            <p><strong>Version:</strong> 1.0.0.RC1</p>
+                            
+                        </div>
+
+                        
+                        <div id="table-of-content">
+                            <h2>Table of Contents</h2>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="#introduction"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#changeLog"><strong>1.1</strong><span>Change log</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="#configuration"><strong>2</strong><span>Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#configuringQueues"><strong>2.1</strong><span>Configuring Queues</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#configuringExchanges"><strong>2.2</strong><span>Configuring Exchanges</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#advancedConfig"><strong>2.3</strong><span>Advanced Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="#sendingMessages"><strong>3</strong><span>Sending Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="#consumingMessages"><strong>4</strong><span>Consuming Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#pubSub"><strong>4.1</strong><span>Pub-Sub</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#manualQueueManagement"><strong>4.2</strong><span>Manual queue management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="#messages"><strong>4.3</strong><span>Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="#rabbitTemplate"><strong>5</strong><span>Using The RabbitTemplate Directly</span></a></div>
+                            
+                            <div style="clear:both" ></div>
+                        </div>
+                        
+                        
+<a name="1. Introduction To The RabbitMQ Plugin"><!-- Legacy link --></a>
+<h1 id="introduction">1 Introduction To The RabbitMQ Plugin</h1>
+The RabbitMQ plugin provides integration with the RabbitMQ highly reliable enterprise messaging system.  The
 plugin relies on <a href="http://www.springsource.org/spring-amqp" target="blank">Spring AMQP</a> as an implementation detail, which provides a high level abstraction
 for sending and receiving messages.<p class="paragraph"/>This guide documents configuration details and usage details for the plugin.  More information on
-RabbitMQ itself is available at <a href="http://www.rabbitmq.com/" target="blank">rabbitmq.com</a>.<h2><a name="1.1 Change log">1.1 Change log</a></h2><h3>Version 0.3 - 7 Feb 2011</h3>
+RabbitMQ itself is available at <a href="http://www.rabbitmq.com/" target="blank">rabbitmq.com</a>.
+
+<a name="1.1 Change log"><!-- Legacy link --></a>
+<h2 id="changeLog">1.1 Change log</h2>
+<h3>Version 0.3.2 - 16 Mar 2011</h3>
+<ul class="star">
+<li>Upgrade to Spring AMQP 1.0.0.M3</li>
+</ul><p class="paragraph"/><h3>Version 0.3.1 - 14 Feb 2011</h3>
+<ul class="star">
+<li>spring-core dependency now excluded</li>
+<li>Corrected the SCM and documentation URLs in the plugin descriptor</li>
+</ul><p class="paragraph"/><h3>Version 0.3 - 7 Feb 2011</h3>
 <ul class="star">
 <li>Upgraded to Spring AMQP 1.0.0 M2</li>
 <li>Added transaction support</li>
@@ -39,15 +122,23 @@ RabbitMQ itself is available at <a href="http://www.rabbitmq.com/" target="blank
 <li>Bug fixes:</li>
 <ul class="star">
 <li><a href="http://jira.codehaus.org/browse/GRAILSPLUGINS-2496" target="blank">GRAILSPLUGINS-2496</a> - Messages are now picked up when the application starts</li>
-</ul></ul><p class="paragraph"/><h1><a name="2. Configuration">2. Configuration</a></h1>The plugin supports a number of configuration options which all may be expressed in <code>grails-app/conf/Config.groovy</code>. A basic configuration might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
+</ul></ul><p class="paragraph"/>
+
+<a name="2. Configuration"><!-- Legacy link --></a>
+<h1 id="configuration">2 Configuration</h1>
+The plugin supports a number of configuration options which all may be expressed in <code>grails-app/conf/Config.groovy</code>. A basic configuration might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/Config.groovy
 rabbitmq &#123;
     connectionfactory &#123;
         username = 'guest'
         password = 'guest'
         hostname = 'localhost'
     &#125;
-&#125;</pre></div><p class="paragraph"/>Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a RabbitMQ server.<p class="paragraph"/>Following is a list of other configuration settings supported by the plugin.<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Configuration Property</strong></th><th><strong class="bold">Description</strong></th><th><strong class="bold">Default</strong></th></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.username</td><td>The user name for connection to the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.password</td><td>The password for connection to the server</td><td>(none)</td></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.hostname</td><td>The host name of the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.virtualHost</td><td>The name of the virtual host to connect to</td><td>'/'</td></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.channelCacheSize</td><td>The connection channel cache size</td><td>10</td></tr><tr class="table-even"><td>rabbitmq.concurrentConsumers</td><td>The number of concurrent consumers to create per message handler.  Raising the number is recommendable in order to scale the consumption of messages coming in from a queue.  Note that ordering guarantees are lost when multiple consumers are registered.</td><td>1</td></tr></table>
-<h2><a name="2.1 Configuring Queues">2.1 Configuring Queues</a></h2>Queues must be declared in the RabbitMQ server before consumers can be associated with those queues and before messages may be sent to those queues. If the Grails application will be sending messages to or receiving messages from queues that may not already be declared in the RabbitMQ server, the application needs to declare those queues up front. One way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>. That 
+&#125;</pre></div><p class="paragraph"/>Those are settings which are necessary in order for the plugin to be able to connect to and communicate with a RabbitMQ server.<p class="paragraph"/>Following is a list of other configuration settings supported by the plugin.<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Configuration Property</strong></th><th><strong class="bold">Description</strong></th><th><strong class="bold">Default</strong></th></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.username</td><td>The user name for connection to the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.password</td><td>The password for connection to the server</td><td>(none)</td></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.hostname</td><td>The host name of the server</td><td>(none)</td></tr><tr class="table-even"><td>rabbitmq.connectionfactory.virtualHost</td><td>The name of the virtual host to connect to</td><td>'/'</td></tr><tr class="table-odd"><td>rabbitmq.connectionfactory.channelCacheSize</td><td>The connection channel cache size</td><td>10</td></tr><tr class="table-even"><td>rabbitmq.concurrentConsumers</td><td>The number of concurrent consumers to create per message handler.  Raising the number is recommended in order to scale the consumption of messages coming in from a queue.  Note that ordering guarantees are lost when multiple consumers are registered.</td><td>1</td></tr><tr class="table-odd"><td>rabbitmq.disableListening</td><td>Disables all service listeners so that they won't receive any messages.</td><td>false</td></tr><tr class="table-even"><td>rabbitmq.retryPolicy.maxAttempts</td><td>Sets the maximum number of retries for failed message deliveries</td><td>0</td></tr></table>
+
+
+<a name="2.1 Configuring Queues"><!-- Legacy link --></a>
+<h2 id="configuringQueues">2.1 Configuring Queues</h2>
+Queues must be declared in the RabbitMQ server before consumers can be associated with those queues and before messages may be sent to those queues. If the Grails application will be sending messages to or receiving messages from queues that may not already be declared in the RabbitMQ server, the application needs to declare those queues up front. One way to do that is to add beans to the Spring application context of type <code>org.springframework.amqp.core.Queue</code>. That 
 might look something like this:<p class="paragraph"/><div class="code"><pre>// grails&#45;app/conf/spring/resources.groovy
 beans = &#123;
     myQueue(org.springframework.amqp.core.Queue, 'myQueueName') 
@@ -71,7 +162,11 @@ rabbitmq &#123;
 &#125;</pre></div><p class="paragraph"/><blockquote class="note">
 With both techniques, the <code>autoDelete</code>, <code>durable</code> and <code>exclusive</code> attributes default to <code>false</code> and the <code>arguments</code> attribute defaults to null.
 </blockquote><p class="paragraph"/>So what do those queue options mean?<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Option</strong></th><th><strong class="bold">Description</strong></th></tr><tr class="table-odd"><td>autoDelete</td><td>If <code>true</code>, the queue will be removed from the broker when there are no more clients attached to it. Note that this doesn't take effect until after at least one client connects to the queue.</td></tr><tr class="table-even"><td>durable</td><td>If <code>true</code>, the queue will survive a restart of the broker.</td></tr><tr class="table-odd"><td>exclusive</td><td>Only the client that created the queue can connect to it.</td></tr></table><p class="paragraph"/>One final thing: when you declare a standalone queue like this, it automatically gets bound to the broker's default exchange, which has an implicit name of '', i.e. the empty string. You can easily send messages to this queue via the <a href="../ref/All Classes/rabbitSend.html" class="allClasses">rabbitSend</a> method.
-<h2><a name="2.2 Configuring Exchanges">2.2 Configuring Exchanges</a></h2>Queues are the foundation of consuming messages, but what if you want to send messages? In AMQP, you send messages to an exchange and the exchange then routes those messages to the appropriate queues based on something called a binding. The key to setting up complex messaging systems lies in configuring these exchanges and queues appropriately.<p class="paragraph"/><h3>Declaring an exchange</h3><p class="paragraph"/>Let's start with an example of how to set up a simple exchange (with no queues):<p class="paragraph"/><div class="code"><pre>rabbitmq &#123;
+
+
+<a name="2.2 Configuring Exchanges"><!-- Legacy link --></a>
+<h2 id="configuringExchanges">2.2 Configuring Exchanges</h2>
+Queues are the foundation of consuming messages, but what if you want to send messages? In AMQP, you send messages to an exchange and the exchange then routes those messages to the appropriate queues based on something called a binding. The key to setting up complex messaging systems lies in configuring these exchanges and queues appropriately.<p class="paragraph"/><h3>Declaring an exchange</h3><p class="paragraph"/>Let's start with an example of how to set up a simple exchange (with no queues):<p class="paragraph"/><div class="code"><pre>rabbitmq &#123;
     connectionFactory &#123;
         &#8230;
     &#125;
@@ -97,19 +192,61 @@ With both techniques, the <code>autoDelete</code>, <code>durable</code> and <cod
 <li>the default binding for direct exchanges is the queue name (unless this is explicitly overridden by a 'binding' option);</li>
 <li>the 'binding' is ignored for fanout exchanges; and</li>
 <li>the headers exchange requires a map of message header names and values for its binding.</li>
-</ol><p class="paragraph"/>As you can imagine, these few building blocks allow you to configure some pretty complex messaging systems with very little effort. You can tailor the messaging system to your needs rather than tailor your applications to the messaging system.<p class="paragraph"/>
-<h1><a name="3. Sending Messages">3. Sending Messages</a></h1>The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The <code>rabbitSend</code> method accepts 2 parameters. The first parameter is a queue name and the second parameter is the message being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
+</ol><p class="paragraph"/><blockquote class="note">
+RabbitMQ has several built-in exchanges with names of the form 'amq.*', for example 'amq.direct'. If you want to bind to these, you currently have to declare them with the correct attributes, i.e.<p class="paragraph"/><div class="code"><pre>exchange name: <span class="java&#45;quote">"amq.direct"</span>, type: direct, durable: <span class="java&#45;keyword">true</span>, autoDelete: <span class="java&#45;keyword">false</span></pre></div>
+</blockquote><p class="paragraph"/>As you can imagine, these few building blocks allow you to configure some pretty complex messaging systems with very little effort. You can tailor the messaging system to your needs rather than tailor your applications to the messaging system.<p class="paragraph"/>
+
+
+
+<h2 id="advancedConfig">2.3 Advanced Configuration</h2>
+When you need fine-grained control over your service listeners, you can tap into the power of Spring. Since each service listener is implemented as a set of Spring beans, you can use Grails' <a href="http://grails.org/doc/latest/guide/spring.html#propertyOverrideConfiguration" target="blank">bean property override</a> mechanism to provide your own low-level settings.<p class="paragraph"/>So how are these beans set up? If a service has either a <code>rabbitQueue</code> or <code>rabbitSubscribe</code> property, then you will have these beans:
+<ul class="star">
+<li><code>&#60;serviceName&#62;_MessageListenerContainer</code> of type <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/apidocs/org/springframework/amqp/rabbit/listener/SimpleMessageListenerContainer.html" class="api">SimpleMessageListenerContainer</a></li>
+<li><code>&#60;serviceName&#62;RabbitAdapter</code> of type <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/apidocs/org/springframework/amqp/rabbit/listener/adapter/MessageListenerAdapter.html" class="api">MessageListenerAdapter</a></li>
+</ul><p class="paragraph"/>As an example, let's say you have a <code>MessageStoreService</code> like so:<p class="paragraph"/><div class="code"><pre>class MessageStoreService &#123;
+    <span class="java&#45;keyword">static</span> rabbitSubscribe = &#91;exchange: <span class="java&#45;quote">"amq.topic"</span>, routingKey: <span class="java&#45;quote">"logs.&#35;"</span>&#93;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>You can then customise things like the number of concurrent consumers, whether the channel is transacted, what the prefetch count should be, and more! Simply add code like this to your runtime configuration (Config.groovy):<p class="paragraph"/><div class="code"><pre>beans &#123;
+    messageStoreService_MessageListenerContainer &#123;
+        channelTransacted = <span class="java&#45;keyword">false</span>
+        concurrentConsumers = 10
+        prefetchCount = 5
+        queueNames = &#91;<span class="java&#45;quote">"q1"</span>, <span class="java&#45;quote">"q2"</span>&#93; as <span class="java&#45;object">String</span>&#91;&#93;
+    &#125;<p class="paragraph"/>    messageStoreServiceRabbitAdapter &#123;
+        encoding = <span class="java&#45;quote">"UTF&#45;8"</span>
+        responseRoutingKey = <span class="java&#45;quote">"replyQueue"</span>
+    &#125;
+&#125;</pre></div><p class="paragraph"/>This approach works for any property that accepts a basic type. But what about bean references? In this case, you can't use the bean property overrides. Fortunately, the most common bean reference you are likely to want to override, the message converter, has a dedicated configuration option:<p class="paragraph"/><div class="code"><pre>rabbitmq.messageConverterBean = <span class="java&#45;quote">"myCustomMessageConverter"</span></pre></div><p class="paragraph"/>This is a global setting that accepts the name of a message converter bean. For the rare occasions that you need to override other bean references, you can declare your own <code>&#60;serviceName&#62;_MessageListenerContainer</code> or <code>&#60;serviceName&#62;_RabbitAdapter</code> beans in resources.groovy.<p class="paragraph"/>Finally, you can override some of the global config options on a per-service basis:<p class="paragraph"/><div class="code"><pre>rabbitmq &#123;
+    services &#123;
+        messageStoreService &#123;
+            concurrentConsumers = 50
+            disableListening = <span class="java&#45;keyword">true</span>
+        &#125;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>There are many options for customisation and we hope the above will get you started.
+
+
+<a name="3. Sending Messages"><!-- Legacy link --></a>
+<h1 id="sendingMessages">3 Sending Messages</h1>
+The plugin adds a method named <code>rabbitSend</code> to all Grails artefacts (Controllers, Services, TagLibs, etc...).  The <code>rabbitSend</code> method accepts 2 parameters. The first parameter is a queue name and the second parameter is the message being sent.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def sendMessage = &#123;
         rabbitSend 'someQueueName', 'someMessage'
         &#8230;
     &#125;
-&#125;</pre></div><p class="paragraph"/>Messages may also be sent by interacting with the <code>RabbitTemplate</code> Spring bean directly.  See the <a href="../guide/single.html#5. Using The RabbitTemplate Directly" class="guide">Using The RabbitTemplate Directly</a> 
-section for more information.
-<h1><a name="4. Consuming Messages">4. Consuming Messages</a></h1>The plugin provides two simple ways of consuming messages:
+&#125;</pre></div><p class="paragraph"/>Messages may also be sent by interacting with the <code>RabbitTemplate</code> Spring bean directly.  See the <a href="../guide/single.html#rabbitTemplate" class="guide">Using The RabbitTemplate Directly</a> section for more information.
+
+
+<a name="4. Consuming Messages"><!-- Legacy link --></a>
+<h1 id="consumingMessages">4 Consuming Messages</h1>
+The plugin provides two simple ways of consuming messages:
 <ol>
 <li>from a named Queue</li>
 <li>by subscribing to an exchange (the traditional pub/sub model)</li>
 </ol><p class="paragraph"/>Which approach you take depends on whether you want to implement the pub/sub messaging model and how much control you need.
-<h2><a name="4.1 Pub-Sub">4.1 Pub-Sub</a></h2>One of the most common messaging models people use involves a producer broadcasting messages to all registered listeners (or more accurately, consumers). This is known as the publish/subscribe model, or pub/sub for short. There are two steps to getting this set up in Grails:
+
+
+<a name="4.1 Pub-Sub"><!-- Legacy link --></a>
+<h2 id="pubSub">4.1 Pub-Sub</h2>
+One of the most common messaging models people use involves a producer broadcasting messages to all registered listeners (or more accurately, consumers). This is known as the publish/subscribe model, or pub/sub for short. There are two steps to getting this set up in Grails:
 <ol>
 <li>create the exchange you're going to publish messages to</li>
 <li>create some consumers that subscribe to that exchange</li>
@@ -122,13 +259,26 @@ The <code>rabbitSubscribe</code> option only makes sense when applied to fanout 
 </blockquote><p class="paragraph"/>In the case of a topic exchange, you can filter messages based on the routing key. By default your service will receive all messages, but you can override this with an alternative syntax for <code>rabbitSubscribe</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.example<p class="paragraph"/>class SharesService &#123;
     <span class="java&#45;keyword">static</span> rabbitSubscribe = &#91; name: 'shares', routingKey: 'NYSE.GE' &#93;
     &#8230;
-&#125;</pre></div><p class="paragraph"/>In this example, the service will only receive messages that have a routing key of 'GE'. Of course, you can use standard AMQP wildcards too like 'NYSE.#', which will match all messages with a routing key that starts with 'NYSE.'.<p class="paragraph"/>Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.<p class="paragraph"/><h2><a name="4.2 Manual queue management">4.2 Manual queue management</a></h2>The plugin provides a convention based mechanism for associating a listener with a queue. Any Grails Service may express that it wants to receive messages on a specific queue by defining a static property named <code>rabbitQueue</code> and
+&#125;</pre></div><p class="paragraph"/>In this example, the service will only receive messages that have a routing key of 'GE'. Of course, you can use standard AMQP wildcards too like 'NYSE.#', which will match all messages with a routing key that starts with 'NYSE.'.<p class="paragraph"/>Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.<p class="paragraph"/>The map syntax also allows you to customise the properties of the Spring message listener container and the corresponding listener adapter (see the section on <a href="../guide/single.html#advancedConfig" class="guide">advanced configuration</a> for more details on these). For example,<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> rabbitSubscribe = &#91;
+        name: 'shares',
+        routingKey: 'NYSE.GE',
+        encoding: <span class="java&#45;quote">"ISO&#45;8859&#45;1"</span>,
+        prefetchCount: 1&#93;</pre></div><p class="paragraph"/>will set the encoding and prefetch count for just this service listener. This technique is also possible for straight queue listeners as well.
+
+
+<a name="4.2 Manual queue management"><!-- Legacy link --></a>
+<h2 id="manualQueueManagement">4.2 Manual queue management</h2>
+The plugin provides a convention based mechanism for associating a listener with a queue. Any Grails Service may express that it wants to receive messages on a specific queue by defining a static property named <code>rabbitQueue</code> and
 assigning the property a string which represents the name of a queue.<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/>class DemoService &#123;
     <span class="java&#45;keyword">static</span> rabbitQueue = 'someQueueName'<p class="paragraph"/>    void handleMessage(message) &#123;
         // handle message&#8230;
     &#125;
-&#125;</pre></div><p class="paragraph"/>As with the pub/sub model, messages are delivered to the service by invoking the <code>handleMessage()</code> method. That's all there is to it! The real trick is to configure your exchanges and queues with appropriate bindings, as we described in the configuration section.<p class="paragraph"/>One last subject to discuss is the form that the messages take.
-<h2><a name="4.3 Messages">4.3 Messages</a></h2>What is a message? In the examples you've seen in this section, the message has been some arbitrary object but we haven't discussed what the type of that object might be. That's because, it can be pretty much anything! Within the messaging system, the content of a message is simply a byte array - it's up to the producer can consumer to interpret/convert that raw data.<p class="paragraph"/>Fortunately the plugin (via <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/reference/htmlsingle/#d0e335" target="blank">Spring AMQP</a>) automatically handles messages whose content is in familiar forms, including:
+&#125;</pre></div><p class="paragraph"/>As with the pub/sub model, messages are delivered to the service by invoking the <code>handleMessage()</code> method. That's all there is to it! The real trick is to configure your exchanges and queues with appropriate bindings, as we described in the configuration section.<p class="paragraph"/>If you want more say in the configuration of the underlying listener, then you can also specify a map:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> rabbitQueue = &#91;queues: <span class="java&#45;quote">"someQueueName"</span>, channelTransacted: <span class="java&#45;keyword">true</span>&#93;</pre></div><p class="paragraph"/>The "queues" option can either be a simple queue name or a list of queue names. Again, have a look at the <a href="../guide/single.html#advancedConfig" class="guide">advanced configuration section</a> for information about the extra properties you can set here.<p class="paragraph"/>One last subject to discuss is the form that the messages take.
+
+
+<a name="4.3 Messages"><!-- Legacy link --></a>
+<h2 id="messages">4.3 Messages</h2>
+What is a message? In the examples you've seen in this section, the message has been some arbitrary object but we haven't discussed what the type of that object might be. That's because, it can be pretty much anything! Within the messaging system, the content of a message is simply a byte array - it's up to the producer can consumer to interpret/convert that raw data.<p class="paragraph"/>Fortunately the plugin (via <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e335" target="blank">Spring AMQP</a>) automatically handles messages whose content is in familiar forms, including:
 <ul class="star">
 <li>strings</li>
 <li>byte arrays</li>
@@ -142,20 +292,57 @@ assigning the property a string which represents the name of a queue.<p class="p
     &#125;<p class="paragraph"/>    void handleMessage(<span class="java&#45;object">byte</span>&#91;&#93; byteMessage) &#123;
         // handle <span class="java&#45;object">byte</span> array message&#8230;
     &#125;
-&#125;</pre></div><p class="paragraph"/>This is a great convenience, but be aware that using serializable Java objects limits the types of client you can interact with. If all the clients you're interested in are using Spring AMQP, then you should be fine, but don't expect Ruby or Python clients to handle <code>Map</code> messages! For production systems, we recommend you use strings and byte arrays.
-<h1><a name="5. Using The RabbitTemplate Directly">5. Using The RabbitTemplate Directly</a></h1>Most of the interaction with the RabbitMQ server is being handled by an instance of 
-<code>org.springframework.amqp.rabbit.core.RabbitTemplate</code>.  For many applications this is
-happening at a lower level than the application needs to be concerned with.  The plugin
-does provide a Spring bean to the application context that is an instance of the
-<code>RabbitTemplate</code> class which may be used directly.  The bean name is <code>rabbitTemplate</code>.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def rabbitTemplate<p class="paragraph"/>    def sendMessage = &#123;
+&#125;</pre></div><p class="paragraph"/>This is a great convenience, but be aware that using serializable Java objects limits the types of client you can interact with. If all the clients you're interested in are using Spring AMQP, then you should be fine, but don't expect Ruby or Python clients to handle <code>Map</code> messages! For production systems, we recommend you use strings and byte arrays.<p class="paragraph"/>Sometimes you want access to the raw message, particularly if you want to look at the message headers. If so, just change the signature of the <code>handleMessage()</code> method and add an extra option to your <code>rabbitQueue</code> or <code>rabbitSubscribe</code> property:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.grails.rabbitmq.test<p class="paragraph"/><span class="java&#45;keyword">import</span> org.springframework.amqp.core.Message<p class="paragraph"/>class DemoService &#123;
+    <span class="java&#45;keyword">static</span> rabbitQueue = &#91;queues: 'someQueueName', messageConverterBean: ''&#93;<p class="paragraph"/>    void handleMessage(Message msg) &#123;
+        // Do something with the message headers
+        println <span class="java&#45;quote">"Received message with content type $&#123;msg.contentType&#125;;$&#123;msg.encoding&#125;"</span>
+        &#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>As you can see, all you have to do is accept an argument of type <code>Message</code> and add the <code>messageConverterBean</code> option with an empty string as its value. This disables the automatic message conversion, allowing you to interrogate the raw message as required.
+
+
+
+<h1 id="rabbitTemplate">5 Using The RabbitTemplate Directly</h1>
+Most of the interaction with the RabbitMQ server is being handled by an instance of <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/apidocs/org/springframework/amqp/rabbit/core/RabbitTemplate.html" class="api">RabbitTemplate</a>. For many applications this is happening at a lower level than the application needs to be concerned with. The plugin does provide a Spring bean to the application context that is an instance of the <code>RabbitTemplate</code> class which may be used directly. The bean name is <code>rabbitTemplate</code>.<p class="paragraph"/><div class="code"><pre>class MessageController &#123;<p class="paragraph"/>    def rabbitTemplate<p class="paragraph"/>    def sendMessage = &#123;
         rabbitTemplate.convertAndSend('someQueueName', 'someMessage)
         &#8230;
     &#125;
-&#125;</pre></div><p class="paragraph"/>The full API of the <code>RabbitTemplate</code> class is documented in 
-<a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/" target="blank">The Spring AMQP API Docs</a>.
-        </div>
+&#125;</pre></div>
+
+
+                    </div>
+                </td>
+                <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                    <div class="menu-block"><h1 class="menu-title" onclick="toggleRef(this.parentNode.childNodes[1])">All Classes</h1><div class="menu-sub">
+                        
+                        
+                        <div class="menu-item"><a href="../ref/All%20Classes/rabbitSend.html">rabbitSend</a>
+                        </div>
+                        
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </td>
+            </tr>
+        </table>
+
         <div id="footer">
-             
+            
+            
         </div>
+
+
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
     </body>
 </html>

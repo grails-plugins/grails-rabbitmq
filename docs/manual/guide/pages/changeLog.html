@@ -2,12 +2,12 @@
                       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-    <title>RabbitMQ Plugin 1.0.0.RC1</title>
+    <title>1.1 Change log 1.0.0.RC1</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <link rel="stylesheet" href="../../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
-    <link rel="stylesheet" href="../../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
     <script type="text/javascript">
-function addJsClass(el) {
+function addJsClass() {
     var classes = document.body.className.split(" ");
     classes.push("js");
     document.body.className = classes.join(" ");
@@ -16,14 +16,13 @@ function addJsClass(el) {
 </head>
 
 <body class="body" onload="addJsClass();">
-
 <div id="navigation">
     <ul>
         <li>
             <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
                 <a href="../../guide/index.html" class="button">Table of contents</a>
 
-                <div id="nav-summary-childs">
+                <div id="nav-summary-childs" style="display:none;">
                     
                     <div class="toc-item" style="margin-left:0"><a href="../../guide/introduction.html"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a>
                     </div>
@@ -60,19 +59,57 @@ function addJsClass(el) {
 <table id="colset" border="0" cellpadding="0" cellspacing="0">
     <tr>
         <td id="col1">
-            <div id="main" class="reference corner-all">
+            <div id="main" class="corner-all">
+
+                
 
                 <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
 
-                <h1>rabbitSend</h1><p class="paragraph"/><h2>Purpose</h2><p class="paragraph"/>Sends a message to a RabbitMQ broker.<p class="paragraph"/><h2>Examples</h2><p class="paragraph"/><div class="code"><pre>// Send a string message to the <span class="java&#45;keyword">default</span> direct exchange. It will be routed to any
-// queues that are bound to the <span class="java&#45;keyword">default</span> exchange with the key '' (an empty string).
-rabbitSend <span class="java&#45;quote">"Some message"</span><p class="paragraph"/>// Send a map message to the <span class="java&#45;keyword">default</span> direct exchange. The message will be routed to
-// the queue with the name 'myQueue'.
-rabbitSend <span class="java&#45;quote">"myQueue"</span>, &#91;cmd: <span class="java&#45;quote">"addBook"</span>, title: <span class="java&#45;quote">"The Shining"</span>, author: <span class="java&#45;quote">"Stephen King"</span>&#93;<p class="paragraph"/>// Send a string message to a 'prices' exchange with a routing key of 'shares.NYSE.GE'.
-rabbitSend <span class="java&#45;quote">"prices"</span>, <span class="java&#45;quote">"shares.NYSE.GE"</span>, <span class="java&#45;quote">"$354.23"</span></pre></div><p class="paragraph"/><h2>Description</h2><p class="paragraph"/>The <code>rabbitSend()</code> method is basically a convenience over the <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/reference/html/#d0e462" target="blank">Spring AMQP convertAndSend()</a> method. It has three basic forms:<p class="paragraph"/><div class="code"><pre>rabbitSend message
-rabbitSend routingKey, message
-rabbitSend exchangeName, routingKey, message</pre></div><p class="paragraph"/>If <code>routingKey</code> is left out, it defaults to a value of '', i.e. the empty string. The same goes for <code>exchangeName</code>, in which case the message is routed to the queue with the same name as the routing key (if specified).<p class="paragraph"/>The message can be any serializable type, although if you want to interoperate with non-Java clients, it's best to stick to string and byte array messages.<p class="paragraph"/>For complex requirements, you can even pass in an object that processes the message after construction. See the Spring AMQP guide for more information on that.
+                
+                    <div class="toc-item next-right"><a href="../../guide/configuration.html"><strong>2</strong><span>Configuration</span> >></a></div>
+                
 
+
+                <div class="project">
+                    <h1>1.1 Change log - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Jeff Brown, Peter Ledbrook</p>
+
+                    <p><strong>Version:</strong> 1.0.0.RC1</p>
+
+                    
+                </div>
+
+                
+
+                
+<a name="1.1 Change log"><!-- Legacy link --></a>
+<h2 id="changeLog">1.1 Change log</h2>
+<h3>Version 0.3.2 - 16 Mar 2011</h3>
+<ul class="star">
+<li>Upgrade to Spring AMQP 1.0.0.M3</li>
+</ul><p class="paragraph"/><h3>Version 0.3.1 - 14 Feb 2011</h3>
+<ul class="star">
+<li>spring-core dependency now excluded</li>
+<li>Corrected the SCM and documentation URLs in the plugin descriptor</li>
+</ul><p class="paragraph"/><h3>Version 0.3 - 7 Feb 2011</h3>
+<ul class="star">
+<li>Upgraded to Spring AMQP 1.0.0 M2</li>
+<li>Added transaction support</li>
+<li>Added support for pub/sub model</li>
+<li>Applications can now configure exchanges and bindings in addition to queues</li>
+<li>Applications can now connect to any virtual host, not just '/'</li>
+<li>Bug fixes:</li>
+<ul class="star">
+<li><a href="http://jira.codehaus.org/browse/GRAILSPLUGINS-2496" target="blank">GRAILSPLUGINS-2496</a> - Messages are now picked up when the application starts</li>
+</ul></ul><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/configuration.html"><strong>2</strong><span>Configuration</span> >></a></div>
+                
+                <div style="clear:both"></div>
             </div>
         </td>
         <td id="col2">
@@ -83,15 +120,13 @@ rabbitSend exchangeName, routingKey, message</pre></div><p class="paragraph"/>If
                 </div>
                 <div class="menu">
                     
-                    <div class="menu-block">
-                        <h1 class="menu-title" onclick="toggleRef(nextElement(this))">All Classes</h1>
-                        <div class="menu-sub selected">
-                            
+                    <div class="menu-block"><h1 class="menu-title" onclick="toggleRef(this.parentNode.childNodes[1])">All Classes</h1><div class="menu-sub">
+                        
                             
                             <div class="menu-item"><a href="../../ref/All%20Classes/rabbitSend.html">rabbitSend</a>
                             </div>
                             
-                        </div>
+                            </div>
                     </div>
                     
                 </div>
@@ -105,8 +140,7 @@ rabbitSend exchangeName, routingKey, message</pre></div><p class="paragraph"/>If
     
 </div>
 
-
-<script type="text/javascript" src="../../js/docs.js"></script>
+<script type="text/javascript" src="../js/docs.js"></script>
 
 </body>
 </html>

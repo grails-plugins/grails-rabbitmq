@@ -1,15 +1,134 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
     <head>
-        <title>RabbitMQ Plugin 0.3 Reference Documentation</title>
+        <title>RabbitMQ Plugin 1.0.0.RC1</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="./css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+        <link rel="stylesheet" href="./css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <script type="text/javascript">
+function addJsClass(el) {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
     </head>
-    <frameset cols="20%,80%">
-        <frame src="ref/menu.html" name="leftFrame" title="index for guide"/>
-        <frame src="guide/index.html" name="mainFrame" title="main guide contents" scrolling="yes"/>
 
-        <noframes>
-            <h2>Frame Alert</h2>
-            <p/>
-            This document is designed to be viewed using the frames feature. If you see this message, you are using a non-frame-capable web client.
-        </noframes>
-    </frameset>
+    <body class="body" onload="addJsClass();">
+        <div id="navigation">
+            <ul>
+                <li>
+                    <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                        <a href="./guide/index.html" class="button">Table of contents</a>
+                        <div id="nav-summary-childs" style="display:none;">
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/introduction.html"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/configuration.html"><strong>2</strong><span>Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/sendingMessages.html"><strong>3</strong><span>Sending Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/consumingMessages.html"><strong>4</strong><span>Consuming Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0"><a href="./guide/rabbitTemplate.html"><strong>5</strong><span>Using The RabbitTemplate Directly</span></a></div>
+                            
+                        </div>
+                    </div>
+                </li>
+                <li class="separator selected">
+                    <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+                </li>
+            </ul>
+        </div>
+        <div id="header">
+            <div class="images clearfix">
+                
+                
+            </div>
+            <p>The RabbitMQ plugin provides integration with the RabbitMQ Messaging System.</p>
+        </div>
+
+
+        <table id="colset" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td id="col1">
+                    <div id="main" class="corner-all">
+
+                        <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                        <div class="project">
+                            <h1>RabbitMQ Plugin - Reference Documentation</h1>
+                            <p><strong>Authors:</strong> Jeff Brown, Peter Ledbrook</p>
+                            <p><strong>Version:</strong> 1.0.0.RC1</p>
+                            
+                        </div>
+
+                        
+                        <div id="table-of-content">
+                            <h2>Table of Contents</h2>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/introduction.html"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/introduction.html#changeLog"><strong>1.1</strong><span>Change log</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/configuration.html"><strong>2</strong><span>Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/configuration.html#configuringQueues"><strong>2.1</strong><span>Configuring Queues</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/configuration.html#configuringExchanges"><strong>2.2</strong><span>Configuring Exchanges</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/configuration.html#advancedConfig"><strong>2.3</strong><span>Advanced Configuration</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/sendingMessages.html"><strong>3</strong><span>Sending Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/consumingMessages.html"><strong>4</strong><span>Consuming Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/consumingMessages.html#pubSub"><strong>4.1</strong><span>Pub-Sub</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/consumingMessages.html#manualQueueManagement"><strong>4.2</strong><span>Manual queue management</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:10px"><a href="./guide/consumingMessages.html#messages"><strong>4.3</strong><span>Messages</span></a></div>
+                            
+                            <div class="toc-item" style="margin-left:0px"><a href="./guide/rabbitTemplate.html"><strong>5</strong><span>Using The RabbitTemplate Directly</span></a></div>
+                            
+                            <div style="clear:both" ></div>
+                        </div>
+                        
+                        
+                    </div>
+                </td>
+                <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="./guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                    <div class="menu-block"><h1 class="menu-title" onclick="toggleRef(this.parentNode.childNodes[1])">All Classes</h1><div class="menu-sub">
+                        
+                        
+                        <div class="menu-item"><a href="./ref/All%20Classes/rabbitSend.html">rabbitSend</a>
+                        </div>
+                        
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </td>
+            </tr>
+        </table>
+
+        <div id="footer">
+            
+            
+        </div>
+
+
+
+<script type="text/javascript" src="./js/docs.js"></script>
+
+    </body>
 </html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>4.1 Pub-Sub 1.0.0.RC1</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/introduction.html"><strong>1</strong><span>Introduction To The RabbitMQ Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/configuration.html"><strong>2</strong><span>Configuration</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/sendingMessages.html"><strong>3</strong><span>Sending Messages</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/consumingMessages.html"><strong>4</strong><span>Consuming Messages</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/rabbitTemplate.html"><strong>5</strong><span>Using The RabbitTemplate Directly</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>The RabbitMQ plugin provides integration with the RabbitMQ Messaging System.</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/sendingMessages.html">&lt;&lt; <strong>3</strong><span>Sending Messages</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/rabbitTemplate.html"><strong>5</strong><span>Using The RabbitTemplate Directly</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>4.1 Pub-Sub - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Jeff Brown, Peter Ledbrook</p>
+
+                    <p><strong>Version:</strong> 1.0.0.RC1</p>
+
+                    
+                </div>
+
+                
+
+                
+<a name="4.1 Pub-Sub"><!-- Legacy link --></a>
+<h2 id="pubSub">4.1 Pub-Sub</h2>
+One of the most common messaging models people use involves a producer broadcasting messages to all registered listeners (or more accurately, consumers). This is known as the publish/subscribe model, or pub/sub for short. There are two steps to getting this set up in Grails:
+<ol>
+<li>create the exchange you're going to publish messages to</li>
+<li>create some consumers that subscribe to that exchange</li>
+</ol><p class="paragraph"/>The first step can be done either outside of the Grails application or in the plugin's configuration. If the Grails application is the publisher, then it makes sense to declare the exchange in <code>grails-app/conf/Config.groovy</code>.<p class="paragraph"/>The second step is dead easy with the plugin: create a service with a static <code>rabbitSubscribe</code> property and a <code>handleMessage()</code> method. Here's an example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.example<p class="paragraph"/>class SharesService &#123;
+    <span class="java&#45;keyword">static</span> rabbitSubscribe = 'shares'<p class="paragraph"/>    void handleMessage(message) &#123;
+        // handle message&#8230;
+    &#125;
+&#125;</pre></div><p class="paragraph"/>As long as the broker contains an exchange with the name <code>shares</code>, the <code>SharesService</code> will receive all messages sent to that exchange. Every time a message is received from the broker, the service's <code>handleMessage()</code> method is called with the message as its argument. We'll talk more about messages shortly.<p class="paragraph"/><blockquote class="note">
+The <code>rabbitSubscribe</code> option only makes sense when applied to fanout and topic exchanges.
+</blockquote><p class="paragraph"/>In the case of a topic exchange, you can filter messages based on the routing key. By default your service will receive all messages, but you can override this with an alternative syntax for <code>rabbitSubscribe</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> org.example<p class="paragraph"/>class SharesService &#123;
+    <span class="java&#45;keyword">static</span> rabbitSubscribe = &#91; name: 'shares', routingKey: 'NYSE.GE' &#93;
+    &#8230;
+&#125;</pre></div><p class="paragraph"/>In this example, the service will only receive messages that have a routing key of 'GE'. Of course, you can use standard AMQP wildcards too like 'NYSE.#', which will match all messages with a routing key that starts with 'NYSE.'.<p class="paragraph"/>Under the hood, the plugin creates a temporary, exclusive queue for your service which is removed from the broker when your application shuts down. There is no way for you to control the name of the queue or attach another listener to it, but then that's the point in this case. If you do need more control, then you must manage the queues and their bindings yourself.<p class="paragraph"/>The map syntax also allows you to customise the properties of the Spring message listener container and the corresponding listener adapter (see the section on <a href="../guide/single.html#advancedConfig" class="guide">advanced configuration</a> for more details on these). For example,<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">static</span> rabbitSubscribe = &#91;
+        name: 'shares',
+        routingKey: 'NYSE.GE',
+        encoding: <span class="java&#45;quote">"ISO&#45;8859&#45;1"</span>,
+        prefetchCount: 1&#93;</pre></div><p class="paragraph"/>will set the encoding and prefetch count for just this service listener. This technique is also possible for straight queue listeners as well.
+
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/sendingMessages.html">&lt;&lt; <strong>3</strong><span>Sending Messages</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/rabbitTemplate.html"><strong>5</strong><span>Using The RabbitTemplate Directly</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                    <div class="menu-block"><h1 class="menu-title" onclick="toggleRef(this.parentNode.childNodes[1])">All Classes</h1><div class="menu-sub">
+                        
+                            
+                            <div class="menu-item"><a href="../../ref/All%20Classes/rabbitSend.html">rabbitSend</a>
+                            </div>
+                            
+                            </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
