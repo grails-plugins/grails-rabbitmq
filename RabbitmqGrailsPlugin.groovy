@@ -1,3 +1,4 @@
+import org.aopalliance.aop.Advice
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
 import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.grails.rabbitmq.RabbitConfigurationHolder
@@ -7,27 +8,17 @@ import org.grails.rabbitmq.RabbitQueueBuilder
 import org.grails.rabbitmq.RabbitServiceConfigurer
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
+import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-//import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
-import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
-import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
-import org.aopalliance.aop.Advice
-import java.io.ByteArrayOutputStream;
 import org.springframework.amqp.support.converter.SimpleMessageConverter
-import java.io.PrintStream;
+import org.springframework.retry.backoff.FixedBackOffPolicy
+import org.springframework.retry.policy.SimpleRetryPolicy
+import org.springframework.retry.support.RetryTemplate
+import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.retry.MessageRecoverer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class RabbitmqGrailsPlugin {
     // the plugin version
