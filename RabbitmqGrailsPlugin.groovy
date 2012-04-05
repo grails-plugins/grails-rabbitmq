@@ -1,5 +1,6 @@
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
 import org.grails.rabbitmq.AutoQueueMessageListenerContainer
+import org.grails.rabbitmq.RabbitConfigurationHolder
 import org.grails.rabbitmq.RabbitDynamicMethods
 import org.grails.rabbitmq.RabbitErrorHandler
 import org.grails.rabbitmq.RabbitQueueBuilder
@@ -8,10 +9,25 @@ import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+//import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
-import org.grails.rabbitmq.RabbitConfigurationHolder
+import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
+import org.aopalliance.aop.Advice
+import java.io.ByteArrayOutputStream;
+import org.springframework.amqp.support.converter.SimpleMessageConverter
+import java.io.PrintStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.retry.MessageRecoverer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class RabbitmqGrailsPlugin {
     // the plugin version
@@ -85,7 +101,13 @@ class RabbitmqGrailsPlugin {
             }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
-                if (messageConverterBean) messageConverter = ref(messageConverterBean)
+                if (messageConverterBean) {
+                     messageConverter = ref(messageConverterBean)
+                 } else {
+                     def converter = new SimpleMessageConverter()
+                     converter.createMessageIds = true
+                     messageConverter = converter
+                 }
             }
             adm(RabbitAdmin, rabbitMQConnectionFactory)
             rabbitErrorHandler(RabbitErrorHandler)
@@ -158,6 +180,28 @@ class RabbitmqGrailsPlugin {
                     "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
                 }
             }
+            rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
+                def retryPolicy = new SimpleRetryPolicy()
+                def maxRetryAttempts = 0
+                if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
+                    def maxAttemptsConfigValue = rabbitmqConfig.retryPolicy.maxAttempts
+                    if(maxAttemptsConfigValue instanceof Integer) {
+                        maxRetryAttempts = maxAttemptsConfigValue
+                    } else {
+                        log.error "rabbitmq.retryPolicy.maxAttempts [$maxAttemptsConfigValue] of type [${maxAttemptsConfigValue.getClass().getName()}] is not an Integer and will be ignored.  The default value of [${maxRetryAttempts}] will be used"
+                    }
+                }
+                retryPolicy.maxAttempts = maxRetryAttempts
+                
+                def backOffPolicy = new FixedBackOffPolicy()
+                backOffPolicy.backOffPeriod = 5000
+                
+                def retryTemplate = new RetryTemplate()
+                retryTemplate.retryPolicy  = retryPolicy
+                retryTemplate.backOffPolicy = backOffPolicy
+                
+                retryOperations = retryTemplate
+            }
         }   
     }
     
@@ -175,8 +219,10 @@ class RabbitmqGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
+        applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
+                bean.adviceChain = [applicationContext.rabbitRetryHandler] as Advice[]
                 // Now that the listener is properly configured, we can start it.
                 bean.start()
             }
