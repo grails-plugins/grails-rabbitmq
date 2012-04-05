@@ -148,6 +148,8 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         
         mockAdminBean.declareQueue = {-> return new Queue(tempQueueName) }
         mockAdminBean.declareBinding = { binding ->
+            assert binding.exchange == exchangeName
+            assert binding.destination == tempQueueName
             declareBindingCalled = true
         }
         
@@ -156,6 +158,6 @@ class AutoQueueMessageListenerContainerTests extends GrailsUnitTestCase {
         testContainer.exchangeBeanName = exchangeName
         testContainer.doStart()
         
-        assertFalse "declareBinding() called", declareBindingCalled
+        assertTrue "declareBinding() was not called", declareBindingCalled
     }
 }
