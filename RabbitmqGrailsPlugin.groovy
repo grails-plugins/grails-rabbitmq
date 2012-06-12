@@ -218,6 +218,18 @@ class RabbitmqGrailsPlugin {
                 bean.start()
             }
         }
+        application.serviceClasses.each { serviceGrailsClass ->
+            def serviceConfigurer = new RabbitServiceConfigurer(
+                    serviceGrailsClass,
+                    application.config.rabbitmq)
+            if (serviceConfigurer.isListener()) {
+                def beans = beans {
+                    serviceConfigurer.configure(delegate)
+                }
+                beans.registerBeans(applicationContext)
+                startServiceListener(serviceGrailsClass.propertyName, applicationContext)
+            }
+        }
     }
     
     def onChange = { evt ->
