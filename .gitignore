@@ -1,3 +1,4 @@
+target-eclipse/
 .settings/
 stacktrace.log
 plugin.xml
