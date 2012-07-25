@@ -17,7 +17,7 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        runtime ('org.springframework.amqp:spring-rabbit:1.0.0.RELEASE') {
+        runtime ('org.springframework.amqp:spring-rabbit:1.1.2.BUILD-SNAPSHOT') {
             excludes 'junit',
                      'spring-aop',
                      'spring-core', // Use spring-core from Grails.
