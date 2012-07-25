@@ -1,6 +1,7 @@
+import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
+
 import org.aopalliance.aop.Advice
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
-import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.grails.rabbitmq.RabbitConfigurationHolder
 import org.grails.rabbitmq.RabbitDynamicMethods
 import org.grails.rabbitmq.RabbitErrorHandler
@@ -11,13 +12,13 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.rabbit.retry.MissingMessageIdAdvice
 import org.springframework.amqp.support.converter.SimpleMessageConverter
 import org.springframework.retry.backoff.FixedBackOffPolicy
+import org.springframework.retry.policy.MapRetryContextCache
 import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
-import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
 
 class RabbitmqGrailsPlugin {
@@ -171,6 +172,7 @@ class RabbitmqGrailsPlugin {
                     "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
                 }
             }
+			
             rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
                 def retryPolicy = new SimpleRetryPolicy()
                 def maxRetryAttempts = 0
@@ -213,7 +215,11 @@ class RabbitmqGrailsPlugin {
         applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
-                bean.adviceChain = [applicationContext.rabbitRetryHandler] as Advice[]
+                def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
+                def cache = new MapRetryContextCache()
+                retryTemplate.retryContextCache = cache
+                def missingIdAdvice = new MissingMessageIdAdvice(cache)
+                bean.adviceChain = [missingIdAdvice, applicationContext.rabbitRetryHandler] as Advice[]
                 // Now that the listener is properly configured, we can start it.
                 bean.start()
             }
