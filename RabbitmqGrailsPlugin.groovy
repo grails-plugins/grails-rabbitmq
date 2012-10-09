@@ -212,7 +212,9 @@ class RabbitmqGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
-        applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
+        if(applicationContext.rabbitTemplate.messageConverter instanceof org.springframework.amqp.support.converter.AbstractMessageConverter) {
+            applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
+        }
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
                 def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
