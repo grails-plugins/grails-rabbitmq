@@ -217,11 +217,8 @@ class RabbitmqGrailsPlugin {
         }
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
-                def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
-                def cache = new MapRetryContextCache()
-                retryTemplate.retryContextCache = cache
-                def missingIdAdvice = new MissingMessageIdAdvice(cache)
-                bean.adviceChain = [missingIdAdvice, applicationContext.rabbitRetryHandler] as Advice[]
+                initialiseAdviceChain bean, applicationContext
+
                 // Now that the listener is properly configured, we can start it.
                 bean.start()
             }
@@ -246,6 +243,19 @@ class RabbitmqGrailsPlugin {
                     startServiceListener(serviceGrailsClass.propertyName, evt.ctx)
                 }
             } 
+
+            // Other listener containers may have been stopped if they were
+            // affected by the re-registering of the changed class. For example,
+            // if the Rabbitmq consumer service directly or indirectly depends
+            // on a modified service. So we need to restart those that aren't
+            // running.
+            def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
+            containerBeans.each { beanName, bean ->
+                if (!bean.running) {
+                    initialiseAdviceChain bean, applicationContext
+                    bean.start()
+                }
+            }
         }
     }
 
@@ -260,5 +270,14 @@ class RabbitmqGrailsPlugin {
     protected startServiceListener(servicePropertyName, applicationContext) {
         def beanName = servicePropertyName + RabbitServiceConfigurer.LISTENER_CONTAINER_SUFFIX
         applicationContext.getBean(beanName).start()
+    }
+
+    protected initialiseAdviceChain(listenerBean, applicationContext) {
+        def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
+        def cache = new MapRetryContextCache()
+        retryTemplate.retryContextCache = cache
+
+        def missingIdAdvice = new MissingMessageIdAdvice(cache)
+        listenerBean.adviceChain = [missingIdAdvice, applicationContext.rabbitRetryHandler] as Advice[]
     }
 }
