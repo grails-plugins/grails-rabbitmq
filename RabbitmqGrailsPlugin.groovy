@@ -175,7 +175,7 @@ class RabbitmqGrailsPlugin {
 			
             rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
                 def retryPolicy = new SimpleRetryPolicy()
-                def maxRetryAttempts = 0
+                def maxRetryAttempts = 1
                 if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
                     def maxAttemptsConfigValue = rabbitmqConfig.retryPolicy.maxAttempts
                     if(maxAttemptsConfigValue instanceof Integer) {
