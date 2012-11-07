@@ -182,7 +182,6 @@ class RabbitServiceConfigurer {
             delegate.delegate = ref(propertyName)
 
             for (entry in adapterOptions) {
-                println ">> Setting adapter option ${entry.key} to ${entry.value}"
                 delegate."${entry.key}" = entry.value
             }
         }
@@ -208,7 +207,6 @@ class RabbitServiceConfigurer {
             concurrentConsumers = serviceConcurrentConsumers
             messageListener = ref("${propertyName}RabbitAdapter")
             for (entry in containerOptions) {
-                println ">> Setting container option ${entry.key} to ${entry.value}"
                 delegate."${entry.key}" = entry.value
             }
         }
