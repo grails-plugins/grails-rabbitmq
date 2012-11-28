@@ -15,6 +15,8 @@
  */
 package org.grails.rabbitmq
 
+import org.slf4j.LoggerFactory
+
 import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.springframework.amqp.core.AcknowledgeMode
@@ -31,6 +33,9 @@ import org.springframework.beans.InvalidPropertyException
  * associated {@link MessageListenerAdapter}.</p>
  */
 class RabbitServiceConfigurer {
+
+    private final static log = LoggerFactory.getLogger(RabbitServiceConfigurer)
+
     public static final String LISTENER_CONTAINER_SUFFIX = "_MessageListenerContainer"
     public static final String MESSAGE_CONVERTER_OPTION = "messageConverterBean"
 
@@ -177,7 +182,6 @@ class RabbitServiceConfigurer {
             delegate.delegate = ref(propertyName)
 
             for (entry in adapterOptions) {
-                println ">> Setting adapter option ${entry.key} to ${entry.value}"
                 delegate."${entry.key}" = entry.value
             }
         }
@@ -203,7 +207,6 @@ class RabbitServiceConfigurer {
             concurrentConsumers = serviceConcurrentConsumers
             messageListener = ref("${propertyName}RabbitAdapter")
             for (entry in containerOptions) {
-                println ">> Setting container option ${entry.key} to ${entry.value}"
                 delegate."${entry.key}" = entry.value
             }
         }

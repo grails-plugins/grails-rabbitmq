@@ -1,6 +1,7 @@
+import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
+
 import org.aopalliance.aop.Advice
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
-import org.grails.rabbitmq.AutoQueueMessageListenerContainer
 import org.grails.rabbitmq.RabbitConfigurationHolder
 import org.grails.rabbitmq.RabbitDynamicMethods
 import org.grails.rabbitmq.RabbitErrorHandler
@@ -11,18 +12,18 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.rabbit.retry.MissingMessageIdAdvice
 import org.springframework.amqp.support.converter.SimpleMessageConverter
 import org.springframework.retry.backoff.FixedBackOffPolicy
+import org.springframework.retry.policy.MapRetryContextCache
 import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
-import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "1.0.0.RC1"
+    def version = "1.0.0"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
@@ -171,9 +172,10 @@ class RabbitmqGrailsPlugin {
                     "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
                 }
             }
+			
             rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
                 def retryPolicy = new SimpleRetryPolicy()
-                def maxRetryAttempts = 0
+                def maxRetryAttempts = 1
                 if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
                     def maxAttemptsConfigValue = rabbitmqConfig.retryPolicy.maxAttempts
                     if(maxAttemptsConfigValue instanceof Integer) {
@@ -210,10 +212,13 @@ class RabbitmqGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
-        applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
+        if(applicationContext.rabbitTemplate.messageConverter instanceof org.springframework.amqp.support.converter.AbstractMessageConverter) {
+            applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
+        }
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
-                bean.adviceChain = [applicationContext.rabbitRetryHandler] as Advice[]
+                initialiseAdviceChain bean, applicationContext
+
                 // Now that the listener is properly configured, we can start it.
                 bean.start()
             }
@@ -238,6 +243,19 @@ class RabbitmqGrailsPlugin {
                     startServiceListener(serviceGrailsClass.propertyName, evt.ctx)
                 }
             } 
+
+            // Other listener containers may have been stopped if they were
+            // affected by the re-registering of the changed class. For example,
+            // if the Rabbitmq consumer service directly or indirectly depends
+            // on a modified service. So we need to restart those that aren't
+            // running.
+            def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
+            containerBeans.each { beanName, bean ->
+                if (!bean.running) {
+                    initialiseAdviceChain bean, applicationContext
+                    bean.start()
+                }
+            }
         }
     }
 
@@ -252,5 +270,14 @@ class RabbitmqGrailsPlugin {
     protected startServiceListener(servicePropertyName, applicationContext) {
         def beanName = servicePropertyName + RabbitServiceConfigurer.LISTENER_CONTAINER_SUFFIX
         applicationContext.getBean(beanName).start()
+    }
+
+    protected initialiseAdviceChain(listenerBean, applicationContext) {
+        def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
+        def cache = new MapRetryContextCache()
+        retryTemplate.retryContextCache = cache
+
+        def missingIdAdvice = new MissingMessageIdAdvice(cache)
+        listenerBean.adviceChain = [missingIdAdvice, applicationContext.rabbitRetryHandler] as Advice[]
     }
 }
