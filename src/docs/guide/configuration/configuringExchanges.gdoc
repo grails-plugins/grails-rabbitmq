@@ -6,7 +6,7 @@ Let's start with an example of how to set up a simple exchange (with no queues):
 
 {code}
 rabbitmq {
-    connectionFactory {
+    connectionfactory {
         ...
     }
     queues = {
@@ -48,7 +48,7 @@ An exchange on its own isn't particularly useful, but we can easily bind queues 
 
 {code}
 rabbitmq {
-    connectionFactory {
+    connectionfactory {
         ...
     }
     queues = {
