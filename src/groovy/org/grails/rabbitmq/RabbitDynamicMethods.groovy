@@ -13,6 +13,7 @@ class RabbitDynamicMethods {
     static void applyAllMethods(target, ctx) {
         applyRabbitSend(target, ctx)
         applyRabbitRpcTimeout(target, ctx)
+        applyRabbitResetRpcTimeout(target, ctx)
         applyRabbitRpcSend(target, ctx)
     }
 
@@ -30,6 +31,12 @@ class RabbitDynamicMethods {
     static void applyRabbitRpcTimeout(target, ctx) {
         target.metaClass.rabbitRpcTimeout = { long timeout ->
             ctx.rabbitTemplate.setReplyTimeout(timeout)
+        }
+    }
+
+    static void applyRabbitResetRpcTimeout(target, ctx) {
+        target.metaClass.rabbitResetRpcTimeout = {
+            ctx.rabbitTemplate.setReplyTimeout(5000)
         }
     }
 
