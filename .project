@@ -26,7 +26,7 @@
 		<link>
 			<name>.link_to_grails_plugins</name>
 			<type>2</type>
-			<locationURI>GRAILS_ROOT/2.1.1/projects/rabbitmq/plugins</locationURI>
+			<locationURI>GRAILS_ROOT/2.1.1/projects/rabbitmq-rax/plugins</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
