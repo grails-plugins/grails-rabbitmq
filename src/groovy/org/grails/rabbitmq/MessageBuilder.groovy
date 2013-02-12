@@ -240,7 +240,7 @@ class MessageBuilder {
      * @param message Message to convert
      * @return Converted message
      */
-    private Object convertReply(Message message) {
+    public static Object convertReply(Message message) {
         // Get the content type
         String contentType = message.getMessageProperties().getContentType()
         
