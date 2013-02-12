@@ -70,7 +70,7 @@ class MessageBuilder {
     /**
      * Sends a message to the rabbit service.
      */
-    private void doSend() {
+    protected void doSend() {
         // Get properties
         MessageProperties properties = getProperties()
         
@@ -139,7 +139,7 @@ class MessageBuilder {
      * 
      * @return
      */
-    private Object doRpc() {
+    protected Object doRpc() {
         // Get properties
         MessageProperties properties = getProperties()
 
@@ -240,7 +240,7 @@ class MessageBuilder {
      * @param message Message to convert
      * @return Converted message
      */
-    public static Object convertReply(Message message) {
+    protected Object convertReply(Message message) {
         // Get the content type
         String contentType = message.getMessageProperties().getContentType()
         
@@ -268,7 +268,7 @@ class MessageBuilder {
      * Creates the message properties.
      *     
      */
-    private MessageProperties getProperties() {
+    protected MessageProperties getProperties() {
         // Create message properties
         def properties = new MessageProperties()
         
@@ -296,7 +296,7 @@ class MessageBuilder {
      * @param source Object to convert.
      * @return Source object converted to a byte array.
      */
-    private Message createMessage(Object source, MessageProperties properties) {
+    protected Message createMessage(Object source, MessageProperties properties) {
         // Get the message converter
         def converter = rabbitTemplate.getMessageConverter()
         
@@ -309,7 +309,7 @@ class MessageBuilder {
      * 
      * @param closure
      */
-    private void run(Closure closure) {
+    protected void run(Closure closure) {
         Closure clone = closure.clone()
         clone.delegate = this
         clone.resolveStrategy = Closure.DELEGATE_ONLY
