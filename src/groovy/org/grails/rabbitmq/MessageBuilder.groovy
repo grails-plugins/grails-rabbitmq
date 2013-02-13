@@ -1,5 +1,6 @@
 package org.grails.rabbitmq
 
+import grails.converters.JSON
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.spring.GrailsWebApplicationContext
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
@@ -76,7 +77,7 @@ class MessageBuilder {
         
         // Convert the object and create the message
         Message prepared = createMessage(message, properties)
-        
+
         // Send the message
         if (exchange) {
             rabbitTemplate.send(exchange, routingKey, prepared)
@@ -297,11 +298,19 @@ class MessageBuilder {
      * @return Source object converted to a byte array.
      */
     protected Message createMessage(Object source, MessageProperties properties) {
-        // Get the message converter
-        def converter = rabbitTemplate.getMessageConverter()
+        // Check for lists or maps
+        if (source instanceof List || source instanceof Map) {
+            source = new JSON(source)
+        }
         
-        // Convert the payload and create a message
-        return converter.toMessage(source, properties)
+        // Check for JSON
+        if (source instanceof JSON) {
+            properties.setContentType('application/json')
+            return new Message(source.toString().getBytes(), properties)
+        }
+        
+        // Do automatic conversion (this doesn't always work)
+        return rabbitTemplate.getMessageConverter().toMessage(source, properties)
     }
     
     /**
@@ -313,7 +322,7 @@ class MessageBuilder {
         Closure clone = closure.clone()
         clone.delegate = this
         clone.resolveStrategy = Closure.DELEGATE_ONLY
-        clone()
+        clone.run()
     }
 }
 
