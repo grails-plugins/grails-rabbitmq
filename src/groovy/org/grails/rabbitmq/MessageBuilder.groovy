@@ -2,6 +2,7 @@ package org.grails.rabbitmq
 
 import grails.converters.JSON
 import groovy.json.JsonSlurper
+import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.codehaus.groovy.grails.commons.spring.GrailsWebApplicationContext
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
@@ -16,6 +17,11 @@ class MessageBuilder {
      * Rabbit Template bean.
      */
     RabbitTemplate rabbitTemplate = null
+    
+    /**
+     * Grails application context.
+     */
+    DefaultGrailsApplication grailsApplication = null
     
     /**
      * Routing key to send the message to.
@@ -63,9 +69,14 @@ class MessageBuilder {
      * Loads the rabbit template bean registered from the grails plugin.
      */
     public MessageBuilder() {
-        // Grab the rabbit template
+        // Grab the application context
         GrailsWebApplicationContext context = SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
+        
+        // Grab the rabbit template
         rabbitTemplate = context.getBean('rabbitTemplate')
+        
+        // Grab the grails application context
+        grailsApplication = context.grailsApplication
     }
 
     /**
@@ -302,7 +313,12 @@ class MessageBuilder {
         if (source instanceof List || source instanceof Map) {
             source = new JSON(source)
         }
-        
+
+        // Check for domains
+        if (grailsApplication.isDomainClass(source.getClass())) {
+            source = new JSON(source)
+        }
+             
         // Check for JSON
         if (source instanceof JSON) {
             properties.setContentType('application/json')

@@ -23,7 +23,9 @@ import org.springframework.retry.support.RetryTemplate
 
 class RabbitmqRaxGrailsPlugin {
     // the plugin version
-    def version = "1.0.7"
+    def version = "1.0.8"
+    // plugin group
+    def group = 'com.rackspace.rvi'
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
