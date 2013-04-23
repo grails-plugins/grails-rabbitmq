@@ -13,11 +13,11 @@ class MessageSerializationTests extends AbstractTestCase {
     void testSendingSerializableMessage() {
         assert Person.count() == 0
 
-        producerService.sendPersonMessage("Peter", 34)    
-        producerService.sendPersonMessage("Bob", 46)    
-        producerService.sendPersonMessage("Jill", 26)    
-        producerService.sendPersonMessage("Amy", 43)    
-        producerService.sendPersonMessage("Kate", 12)    
+        producerService.sendPersonMessage("Peter", 34)
+        producerService.sendPersonMessage("Bob", 46)
+        producerService.sendPersonMessage("Jill", 26)
+        producerService.sendPersonMessage("Amy", 43)
+        producerService.sendPersonMessage("Kate", 12)
 
         // Wait for the messages to be consumed.
         assert tryUntil(500, 10000) {

@@ -43,7 +43,7 @@ class RabbitDynamicMethods {
     static void applyRabbitRpcSend(target, ctx) {
         target.metaClass.rabbitRpcSend = { Object[] args ->
             args = processArgs(args)
-            return ctx.rabbitTemplate.convertSendAndReceive(*args) 
+            return ctx.rabbitTemplate.convertSendAndReceive(*args)
         }
     }
 
