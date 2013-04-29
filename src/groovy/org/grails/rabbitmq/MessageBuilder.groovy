@@ -340,10 +340,9 @@ class MessageBuilder {
      * @param closure
      */
     protected void run(Closure closure) {
-        Closure clone = closure.clone()
-        clone.delegate = this
-        clone.resolveStrategy = Closure.OWNER_ONLY
-        clone.run()
+        closure.delegate = this
+        closure.resolveStrategy = Closure.OWNER_FIRST
+        closure.run()
     }
 }
 
