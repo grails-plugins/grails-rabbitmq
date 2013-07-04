@@ -67,6 +67,7 @@ class RabbitmqGrailsPlugin {
         def connectionFactoryPassword = connectionFactoryConfig?.password
         def connectionFactoryVirtualHost = connectionFactoryConfig?.virtualHost
         def connectionFactoryHostname = connectionFactoryConfig?.hostname
+        def connectionFactoryPort = connectionFactoryConfig?.port
         def connectionChannelCacheSize = connectionFactoryConfig?.channelCacheSize ?: 10
 
         def messageConverterBean = rabbitmqConfig.messageConverterBean
@@ -86,6 +87,10 @@ class RabbitmqGrailsPlugin {
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
                 channelCacheSize = connectionChannelCacheSize
+                
+                if (connectionFactoryPort) {
+                    port = connectionFactoryPort
+                }
 
                 if (connectionFactoryVirtualHost) {
                     virtualHost = connectionFactoryVirtualHost
