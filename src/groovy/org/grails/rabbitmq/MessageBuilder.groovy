@@ -101,6 +101,31 @@ class MessageBuilder {
     /**
      * Sends a message to the rabbit service.
      *
+     * @throws IllegalArgumentException
+     *
+     * <p>
+     * Thrown under two conditions:
+     * <br /><br />
+     * 1. If the <code>exchange</code> and <code>routingKey</code> are both <code>null</code>. At least one must be provided.
+     * <br /><br />
+     * 2. If the <code>message</code> is <code>null</code>.
+     * </p>
+     */
+    public void send() {
+        if (! (exchange || routingKey)) {
+            throw new IllegalArgumentException("Exchange and/or Routing Key required.")
+        }
+
+        if (!message) {
+            throw new IllegalArgumentException("Message required")
+        }
+
+        doSend()
+    }
+
+    /**
+     * Sends a message to the rabbit service.
+     *
      * @param closure
      */
     public void send(Closure closure) {
@@ -189,6 +214,33 @@ class MessageBuilder {
         }
 
         return result
+    }
+
+    /**
+     * Sends a message to the bus and waits for a reply, up to the "timeout" property.
+     *
+     * @return
+     *
+     * @throws IllegalArgumentException
+     *
+     * <p>
+     * Thrown under two conditions:
+     * <br /><br />
+     * 1. If the <code>exchange</code> and <code>routingKey</code> are both <code>null</code>. At least one must be provided.
+     * <br /><br />
+     * 2. If the <code>message</code> is <code>null</code>.
+     * </p>
+     */
+    public Object rpc() {
+        if (! (exchange || routingKey)) {
+            throw new IllegalArgumentException("Exchange and/or Routing Key required.")
+        }
+
+        if (!message) {
+            throw new IllegalArgumentException("Message required")
+        }
+
+        return doRpc()
     }
 
     /**
