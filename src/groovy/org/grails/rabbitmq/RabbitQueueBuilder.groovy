@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory
 class RabbitQueueBuilder {
 
     private final static log = LoggerFactory.getLogger(RabbitQueueBuilder)
-    
+
     def bindings = []
     def exchanges = []
     def queues = []
 
     private currentExchange
-    
+
     def methodMissing(String methodName, args) {
         def queue
 

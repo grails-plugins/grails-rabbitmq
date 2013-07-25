@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>rabbitmq</name>
+	<name>rabbitmq-rax</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -17,16 +17,16 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.springsource.sts.grails.core.nature</nature>
+		<nature>org.grails.ide.eclipse.core.nature</nature>
 		<nature>org.eclipse.jdt.groovy.core.groovyNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
 	<linkedResources>
 		<link>
-			<name>tomcat-1.3.4-src-groovy</name>
+			<name>.link_to_grails_plugins</name>
 			<type>2</type>
-			<location>/Users/pledbrook/dev/projects/git/grails-plugins/grails-rabbitmq/target/plugins/tomcat-1.3.4/src/groovy</location>
+			<locationURI>GRAILS_ROOT/2.1.1/projects/rabbitmq-rax/plugins</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

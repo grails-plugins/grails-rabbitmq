@@ -83,7 +83,7 @@ class RabbitGrailsPluginTests extends GroovyTestCase {
         def mockTealService = new MockSubscribeService(propertyName: 'tealService')
 
         def application = new Object()
-        
+
         application.metaClass.getServiceClasses = {
             return [mockBlueService, mockRedService, mockPinkService, mockTealService]
         }

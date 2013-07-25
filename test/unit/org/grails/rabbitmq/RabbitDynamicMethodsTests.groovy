@@ -26,10 +26,10 @@ class RabbitDynamicMethodsTests extends GrailsUnitTestCase {
             assert ex == "ex"
             assert q == "myQ"
             assert content == "Some message"
-            
+
             // Execute the callback and make sure that it sets reply queue
             // in the message properties properly.
-            def msg = new Message(ex.bytes, new MessageProperties()) 
+            def msg = new Message(ex.bytes, new MessageProperties())
             mpp.postProcessMessage(msg)
             assert msg.messageProperties?.replyToAddress?.routingKey == "replyQ"
         }
@@ -37,7 +37,7 @@ class RabbitDynamicMethodsTests extends GrailsUnitTestCase {
         def testContext = new MockApplicationContext()
         testContext.registerMockBean "rabbitTemplate", tmplControl.createMock()
         RabbitDynamicMethods.applyRabbitRpcSend(Map, testContext)
-        
+
         def testObj = [:]
         testObj.rabbitRpcSend "ex", "myQ", "Some message", "replyQ"
 

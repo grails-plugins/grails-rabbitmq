@@ -6,7 +6,7 @@ class DemoService {
     void handleMessage(String textMessage) {
         println "Received Message: ${textMessage}"
     }
-    
+
     void handleMessage(Map mapMessage) {
         println "Received Map Message..."
         mapMessage?.each { key, val ->

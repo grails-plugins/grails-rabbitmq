@@ -15,7 +15,7 @@ def installMsg = '''
 ******************************
 
 The RabbitMQ Plugin has been installed.  The plugin requires properties be
-defined in grails-app/conf/Config.groovy.  Specifically, connection factory 
+defined in grails-app/conf/Config.groovy.  Specifically, connection factory
 settings must be defined.  Example:
 
 rabbitmq {

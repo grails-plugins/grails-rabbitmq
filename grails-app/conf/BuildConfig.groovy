@@ -1,6 +1,6 @@
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir	= "target/test-reports"
+grails.project.test.reports.dir    = "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -9,7 +9,7 @@ grails.project.dependency.resolution = {
         // excludes 'ehcache'
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
-    repositories {        
+    repositories {
         grailsPlugins()
         grailsHome()
         grailsCentral()
@@ -17,7 +17,7 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        runtime ('org.springframework.amqp:spring-rabbit:1.1.3.RELEASE') {
+        compile ('org.springframework.amqp:spring-rabbit:1.1.3.RELEASE') {
             excludes 'junit',
                      'spring-aop',
                      'spring-core', // Use spring-core from Grails.
@@ -28,7 +28,7 @@ grails.project.dependency.resolution = {
                      'log4j'
         }
 
-        runtime "org.springframework.retry:spring-retry:1.0.0.RELEASE"
+        compile "org.springframework.retry:spring-retry:1.0.0.RELEASE"
     }
 
     plugins {

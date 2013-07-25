@@ -5,21 +5,21 @@ import org.springframework.amqp.core.FanoutExchange
 import org.springframework.amqp.core.TopicExchange
 
 class RabbitQueueBuilderTests extends GroovyTestCase {
-    
+
     void testSimpleQueue() {
         def closure = {
             foo()
         }
-        
+
         def builder = new RabbitQueueBuilder()
-        
+
         closure.delegate = builder
         closure()
-        
+
         def queues = builder.queues
         assertEquals 'wrong number of queues', 1, queues?.size()
         def queue = queues[0]
-        
+
         assertEquals 'wrong queue name', 'foo', queue.name
         assertEquals 'wrong durable value', true, queue.durable
         assertEquals 'wrong auto delete value', false, queue.autoDelete
@@ -95,7 +95,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         assertEquals 'wrong auto delete value', true, queues[0].autoDelete
         assertEquals 'wrong exclusive value', true, queues[0].exclusive
         assertNull 'no arguments expected', queues[0].arguments
-        
+
         def bindings = builder.bindings
         assertEquals 'wrong number of bindings', 1, bindings?.size()
         assertEquals 'wrong exchange bound', 'my.fanout', bindings[0].exchange
@@ -159,7 +159,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         assertEquals 'queue is not auto delete', true, queues[1].autoDelete
         assertEquals 'queue is exclusive', false, queues[1].exclusive
         assertNull 'no arguments expected', queues[1].arguments
-        
+
         def bindings = builder.bindings
         assertEquals 'wrong number of bindings', 2, bindings?.size()
         assertEquals 'wrong exchange bound', 'my.topic', bindings[0].exchange
@@ -259,7 +259,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         assertEquals 'wrong auto delete value', true, queues[0].autoDelete
         assertEquals 'wrong exclusive value', true, queues[0].exclusive
         assertNull 'no arguments expected', queues[0].arguments
-        
+
         def bindings = builder.bindings
         assertEquals 'wrong number of bindings', 1, bindings?.size()
         assertEquals 'wrong exchange bound', 'my.direct', bindings[0].exchange
@@ -295,7 +295,7 @@ class RabbitQueueBuilderTests extends GroovyTestCase {
         assertEquals 'wrong auto delete value', true, queues[0].autoDelete
         assertEquals 'wrong exclusive value', true, queues[0].exclusive
         assertNull 'no arguments expected', queues[0].arguments
-        
+
         def bindings = builder.bindings
         assertEquals 'wrong number of bindings', 1, bindings?.size()
         assertEquals 'wrong exchange bound', 'my.direct', bindings[0].exchange
