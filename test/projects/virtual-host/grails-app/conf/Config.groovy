@@ -17,6 +17,7 @@ rabbitmq {
         password = 'password'
         hostname = 'localhost'
         virtualHost = 'plugin-test'
+        ssl = true
     }
     queues = {
         foo autoDelete: true, durable: false, exclusive: true

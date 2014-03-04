@@ -10,6 +10,7 @@ import org.grails.rabbitmq.RabbitServiceConfigurer
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
@@ -23,7 +24,7 @@ import org.springframework.retry.support.RetryTemplate
 
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "1.0.0"
+    def version = "1.0.0.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
@@ -83,17 +84,44 @@ class RabbitmqGrailsPlugin {
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
             def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
-            rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
-                username = connectionFactoryUsername
-                password = connectionFactoryPassword
-                channelCacheSize = connectionChannelCacheSize
-                
-                if (connectionFactoryPort) {
-                    port = connectionFactoryPort
+            
+            if(connectionFactoryClass == CachingConnectionFactory){
+                log.debug "Selected caching connection factory with embeded rabbit connetion factory"
+                underlyingRabbitMQConnectionFactory(com.rabbitmq.client.ConnectionFactory){bean ->
+                    if(connectionFactoryConfig.ssl){
+                        bean.initMethod = 'useSslProtocol'
+                    }
+
+                    host = connectionFactoryHostname 
+                    username = connectionFactoryUsername 
+                    password = connectionFactoryPassword 
+
+                    if (connectionFactoryPort) {
+                        port = connectionFactoryPort
+                    }
+
+                    if (connectionFactoryVirtualHost) {
+                        virtualHost = connectionFactoryVirtualHost
+                    }
                 }
 
-                if (connectionFactoryVirtualHost) {
-                    virtualHost = connectionFactoryVirtualHost
+                rabbitMQConnectionFactory(connectionFactoryClass, ref('underlyingRabbitMQConnectionFactory')) {
+                    channelCacheSize = connectionChannelCacheSize
+                }
+            }else{
+                log.debug "Selected caching connection factory "
+                rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
+                    username = connectionFactoryUsername
+                    password = connectionFactoryPassword
+                    channelCacheSize = connectionChannelCacheSize
+                
+                    if (connectionFactoryPort) {
+                        port = connectionFactoryPort
+                    }
+
+                    if (connectionFactoryVirtualHost) {
+                        virtualHost = connectionFactoryVirtualHost
+                    }
                 }
             }
             rabbitTemplate(RabbitTemplate) {
@@ -177,7 +205,7 @@ class RabbitmqGrailsPlugin {
                     "grails.rabbit.binding.${binding.exchange}.${binding.queue}"(Binding, binding.queue, QUEUE, binding.exchange, binding.rule, binding.arguments )
                 }
             }
-			
+            
             rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
                 def retryPolicy = new SimpleRetryPolicy()
                 def maxRetryAttempts = 1
