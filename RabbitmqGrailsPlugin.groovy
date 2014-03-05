@@ -79,15 +79,19 @@ class RabbitmqGrailsPlugin {
           
             log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${configHolder.getDefaultConcurrentConsumers()} consumers."
           
-            def connectionFactoryClassName = connectionFactoryConfig?.className ?:
-                    'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
-            def parentClassLoader = getClass().classLoader
-            def loader = new GroovyClassLoader(parentClassLoader)
-            def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
+            def connectionFactoryClass
+            if(connectionFactoryConfig?.className){
+                def connectionFactoryClassName = connectionFactoryConfig?.className
+                def parentClassLoader = getClass().classLoader
+                def loader = new GroovyClassLoader(parentClassLoader)
+                connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
+            }else{
+                connectionFactoryClass = CachingConnectionFactory
+            }
             
             if(connectionFactoryClass == CachingConnectionFactory){
-                log.debug "Selected caching connection factory with embeded rabbit connetion factory"
-                underlyingRabbitMQConnectionFactory(com.rabbitmq.client.ConnectionFactory){bean ->
+                log.debug "Selected caching connection factory with embedded rabbit connection factory"
+                baseRabbitMQConnectionFactory(com.rabbitmq.client.ConnectionFactory){bean ->
                     if(connectionFactoryConfig.ssl){
                         bean.initMethod = 'useSslProtocol'
                     }
@@ -105,11 +109,11 @@ class RabbitmqGrailsPlugin {
                     }
                 }
 
-                rabbitMQConnectionFactory(connectionFactoryClass, ref('underlyingRabbitMQConnectionFactory')) {
+                rabbitMQConnectionFactory(connectionFactoryClass, ref('baseRabbitMQConnectionFactory')) {
                     channelCacheSize = connectionChannelCacheSize
                 }
             }else{
-                log.debug "Selected caching connection factory "
+                log.debug "Selected other connection factory "
                 rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
                     username = connectionFactoryUsername
                     password = connectionFactoryPassword
