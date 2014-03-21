@@ -5,3 +5,13 @@ grails.doc.'api.org.springframework.amqp'='http://static.springsource.org/spring
 
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
+
+rabbitmq {
+    connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+        virtualHost = 'plugin-test'
+        ssl = false
+    }
+}
