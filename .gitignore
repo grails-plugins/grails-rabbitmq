@@ -5,5 +5,5 @@ stacktrace.log
 plugin.xml
 grails-rabbitmq-*.zip*
 target
-web-app/WEB-INF/classes/
+**/web-app/WEB-INF/classes/
 
