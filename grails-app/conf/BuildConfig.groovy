@@ -28,7 +28,7 @@ grails.project.dependency.resolution = {
                      'log4j'
         }
 
-        runtime "org.springframework.retry:spring-retry:1.0.0.RELEASE"
+        runtime "org.springframework.retry:spring-retry:1.0.3.RELEASE"
     }
 
     plugins {
