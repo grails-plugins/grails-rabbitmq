@@ -79,55 +79,35 @@ class RabbitmqGrailsPlugin {
           
             log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${configHolder.getDefaultConcurrentConsumers()} consumers."
           
-            def connectionFactoryClass
-            if(connectionFactoryConfig?.className){
-                def connectionFactoryClassName = connectionFactoryConfig?.className
-                def parentClassLoader = getClass().classLoader
-                def loader = new GroovyClassLoader(parentClassLoader)
-                connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
-            }else{
-                connectionFactoryClass = CachingConnectionFactory
+            /*
+             * Embedding the ConnectionFactory from Rabbit into the rabbitMQConnectionFactory
+             * 
+             * Alternatively, the application developer could override the
+             * comRabbitmqClientConnectionFactory bean and set the required properties
+             * there.
+             */
+            comRabbitmqClientConnectionFactory(com.rabbitmq.client.ConnectionFactory){bean ->
+                if(connectionFactoryConfig.ssl){
+                    bean.initMethod = 'useSslProtocol'
+                }
+
+                host = connectionFactoryHostname 
+                username = connectionFactoryUsername 
+                password = connectionFactoryPassword 
+
+                if (connectionFactoryPort) {
+                    port = connectionFactoryPort
+                }
+
+                if (connectionFactoryVirtualHost) {
+                    virtualHost = connectionFactoryVirtualHost
+                }
+            }
+
+            rabbitMQConnectionFactory(CachingConnectionFactory, ref('comRabbitmqClientConnectionFactory')) {
+                channelCacheSize = connectionChannelCacheSize
             }
             
-            if(connectionFactoryClass == CachingConnectionFactory){
-                log.debug "Selected caching connection factory with embedded rabbit connection factory"
-                baseRabbitMQConnectionFactory(com.rabbitmq.client.ConnectionFactory){bean ->
-                    if(connectionFactoryConfig.ssl){
-                        bean.initMethod = 'useSslProtocol'
-                    }
-
-                    host = connectionFactoryHostname 
-                    username = connectionFactoryUsername 
-                    password = connectionFactoryPassword 
-
-                    if (connectionFactoryPort) {
-                        port = connectionFactoryPort
-                    }
-
-                    if (connectionFactoryVirtualHost) {
-                        virtualHost = connectionFactoryVirtualHost
-                    }
-                }
-
-                rabbitMQConnectionFactory(connectionFactoryClass, ref('baseRabbitMQConnectionFactory')) {
-                    channelCacheSize = connectionChannelCacheSize
-                }
-            }else{
-                log.debug "Selected other connection factory "
-                rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
-                    username = connectionFactoryUsername
-                    password = connectionFactoryPassword
-                    channelCacheSize = connectionChannelCacheSize
-                
-                    if (connectionFactoryPort) {
-                        port = connectionFactoryPort
-                    }
-
-                    if (connectionFactoryVirtualHost) {
-                        virtualHost = connectionFactoryVirtualHost
-                    }
-                }
-            }
             rabbitTemplate(RabbitTemplate) {
                 connectionFactory = rabbitMQConnectionFactory
                 if (messageConverterBean) {
