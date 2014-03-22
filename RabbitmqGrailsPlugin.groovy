@@ -190,8 +190,11 @@ class RabbitmqGrailsPlugin {
                 }
             }
             
-            rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
-                def retryPolicy = new SimpleRetryPolicy()
+            
+			/*
+			 * Retry Handling for all queues
+			 */
+            rabbitRetryPolicy(SimpleRetryPolicy){
                 def maxRetryAttempts = 1
                 if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
                     def maxAttemptsConfigValue = rabbitmqConfig.retryPolicy.maxAttempts
@@ -201,18 +204,22 @@ class RabbitmqGrailsPlugin {
                         log.error "rabbitmq.retryPolicy.maxAttempts [$maxAttemptsConfigValue] of type [${maxAttemptsConfigValue.getClass().getName()}] is not an Integer and will be ignored.  The default value of [${maxRetryAttempts}] will be used"
                     }
                 }
-                retryPolicy.maxAttempts = maxRetryAttempts
-                
-                def backOffPolicy = new FixedBackOffPolicy()
-                backOffPolicy.backOffPeriod = 5000
-                
-                def retryTemplate = new RetryTemplate()
-                retryTemplate.retryPolicy  = retryPolicy
-                retryTemplate.backOffPolicy = backOffPolicy
-                
-                retryOperations = retryTemplate
+                maxAttempts = maxRetryAttempts
             }
-        }   
+            
+            rabbitBackOffPolicy(FixedBackOffPolicy){
+                backOffPeriod = 5000
+            }
+            
+            rabbitRetryTemplate(RetryTemplate){
+                retryPolicy  = ref('rabbitRetryPolicy')
+                backOffPolicy = ref('rabbitBackOffPolicy')
+            }
+            
+            rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
+                retryOperations = ref('rabbitRetryTemplate')
+            }
+        }
     }
     
     def doWithDynamicMethods = { appCtx ->
