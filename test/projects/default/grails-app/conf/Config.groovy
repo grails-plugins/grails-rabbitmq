@@ -1,7 +1,7 @@
 // locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
+grails.config.locations = [ "file:${userHome}/.grails/rabbitmqPluginTestProj-def-config.groovy"]
 //                             "classpath:${appName}-config.groovy",
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
@@ -18,7 +18,7 @@ rabbitmq {
         hostname = 'localhost'
     }
     queues = {
-        foo autoDelete: true, durable: false, exclusive: true
+        foo autoDelete: false, durable: false, exclusive:false 
         fooNonTxn autoDelete: true, durable: false, exclusive: true
         personTestQueue autoDelete: true, durable: false, exclusive: true
 
