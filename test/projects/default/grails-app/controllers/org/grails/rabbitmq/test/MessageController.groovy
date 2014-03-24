@@ -2,9 +2,9 @@ package org.grails.rabbitmq.test
 
 class MessageController {
     
-    def index = {}
+    def index() {}
     
-    def sendMessage = {
+    def sendMessage() {
         def msg = params.msg
         
         rabbitSend 'foo', "Message: ${msg}"
@@ -13,6 +13,6 @@ class MessageController {
         
         rabbitSend 'foo', messageMap
         
-        redirect action: index
+        redirect action: 'index'
     }
 }
