@@ -1,4 +1,5 @@
 import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
+import groovy.util.logging.Log4j
 
 import org.aopalliance.aop.Advice
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
@@ -16,12 +17,13 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.retry.MissingMessageIdAdvice
 import org.springframework.amqp.support.converter.SimpleMessageConverter
+import org.springframework.context.ApplicationContext
 import org.springframework.retry.backoff.FixedBackOffPolicy
 import org.springframework.retry.policy.MapRetryContextCache
 import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
 
-
+@Log4j
 class RabbitmqGrailsPlugin {
     // the plugin version
     def version = "1.0.0.1"
@@ -109,7 +111,7 @@ class RabbitmqGrailsPlugin {
             }
             
             rabbitTemplate(RabbitTemplate) {
-                connectionFactory = rabbitMQConnectionFactory
+                connectionFactory = ref('rabbitMQConnectionFactory')
                 if (messageConverterBean) {
                      messageConverter = ref(messageConverterBean)
                  } else {
@@ -118,7 +120,7 @@ class RabbitmqGrailsPlugin {
                      messageConverter = converter
                  }
             }
-            adm(RabbitAdmin, rabbitMQConnectionFactory)
+            adm(RabbitAdmin, ref('rabbitMQConnectionFactory'))
             rabbitErrorHandler(RabbitErrorHandler)
 
             // Add beans to hook up services as AMQP listeners.
@@ -191,9 +193,9 @@ class RabbitmqGrailsPlugin {
             }
             
             
-			/*
-			 * Retry Handling for all queues
-			 */
+            /*
+             * Retry Handling for all queues
+             */
             rabbitRetryPolicy(SimpleRetryPolicy){
                 def maxRetryAttempts = 1
                 if(rabbitmqConfig?.retryPolicy?.containsKey('maxAttempts')) {
@@ -236,9 +238,12 @@ class RabbitmqGrailsPlugin {
 
     def doWithApplicationContext = { applicationContext ->
         def containerBeans = applicationContext.getBeansOfType(SimpleMessageListenerContainer)
+        
+        // If a different MessageConverter is supplied, turn on createMessageIds
         if(applicationContext.rabbitTemplate.messageConverter instanceof org.springframework.amqp.support.converter.AbstractMessageConverter) {
             applicationContext.rabbitTemplate.messageConverter.createMessageIds = true
         }
+        
         containerBeans.each { beanName, bean ->
             if(isServiceListener(beanName)) {
                 initialiseAdviceChain bean, applicationContext
@@ -291,12 +296,16 @@ class RabbitmqGrailsPlugin {
         return application.isArtefactOfType(ServiceArtefactHandler.TYPE, source)
     }
 
-    protected startServiceListener(servicePropertyName, applicationContext) {
+    protected startServiceListener(servicePropertyName, ApplicationContext applicationContext) {
         def beanName = servicePropertyName + RabbitServiceConfigurer.LISTENER_CONTAINER_SUFFIX
-        applicationContext.getBean(beanName).start()
+        def bean = applicationContext.getBean(beanName)
+        initialiseAdviceChain bean, applicationContext
+        bean.start()
     }
 
     protected initialiseAdviceChain(listenerBean, applicationContext) {
+        log.debug("Initializing advice chain")
+        
         def retryTemplate = applicationContext.rabbitRetryHandler.retryOperations
         def cache = new MapRetryContextCache()
         retryTemplate.retryContextCache = cache
