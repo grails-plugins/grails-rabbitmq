@@ -3,6 +3,7 @@ import groovy.util.logging.Log4j
 
 import org.aopalliance.aop.Advice
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
+import org.grails.rabbitmq.MessageLoggerMessageRecoverer
 import org.grails.rabbitmq.RabbitConfigurationHolder
 import org.grails.rabbitmq.RabbitDynamicMethods
 import org.grails.rabbitmq.RabbitErrorHandler
@@ -26,7 +27,7 @@ import org.springframework.retry.support.RetryTemplate
 @Log4j
 class RabbitmqGrailsPlugin {
     // the plugin version
-    def version = "1.0.0.1"
+    def version = "1.1.0.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
@@ -49,7 +50,8 @@ class RabbitmqGrailsPlugin {
 
     def license = "APACHE"
     def organization = [ name: "SpringSource", url: "http://www.springsource.org/" ]
-    def developers = [ [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ] ]
+    def developers = [ [ name: "Peter Ledbrook", email: "pledbrook@vmware.com" ], 
+		[ name: "Daniel Bower", email: "daniel.bower@infinum.com"] ]
     def issueManagement = [ system: "JIRA", url: "http://jira.codehaus.org/browse/GRAILSPLUGINS" ]
     def scm = [ url: "https://github.com/grails-plugins/grails-rabbitmq" ]
 
@@ -121,6 +123,15 @@ class RabbitmqGrailsPlugin {
                  }
             }
             adm(RabbitAdmin, ref('rabbitMQConnectionFactory'))
+            
+            /* 
+             * This is used to notify for each exception, it is not used to 
+             * divert the message once it has failed.  With the RabbitErrorHandler,
+             * we are just writing a log entry.  This is the default error handler
+             * attached to the listener, unless the listener has its own "handleError"
+             * method, or unless it has been disabled with 
+             * rabbitmq.disableDefaultRabbitErrorHandler = true
+             */
             rabbitErrorHandler(RabbitErrorHandler)
 
             // Add beans to hook up services as AMQP listeners.
@@ -218,8 +229,18 @@ class RabbitmqGrailsPlugin {
                 backOffPolicy = ref('rabbitBackOffPolicy')
             }
             
+            rabbitMessageRecoverer(MessageLoggerMessageRecoverer)
+            
             rabbitRetryHandler(StatefulRetryOperationsInterceptorFactoryBean) {
                 retryOperations = ref('rabbitRetryTemplate')
+                
+                /*
+                 * If we do not want to utilize the default placement onto the 
+                 * dead-letter queue, we can use a MessageRecoverer
+                 */
+                if(rabbitmqConfig.enableMessageRecoverer){
+                    messageRecoverer = ref('rabbitMessageRecoverer')
+                }
             }
         }
     }

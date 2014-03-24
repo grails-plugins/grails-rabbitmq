@@ -38,6 +38,7 @@ class RabbitServiceConfigurer {
 
     public static final String LISTENER_CONTAINER_SUFFIX = "_MessageListenerContainer"
     public static final String MESSAGE_CONVERTER_OPTION = "messageConverterBean"
+    public static final String MESSAGE_ERROR_HANDLER_SUFFIX = "messageErrorHandlerBean"
 
     private static final String QUEUE = "rabbitQueue"
     private static final String SUBSCRIBE = "rabbitSubscribe"
@@ -186,6 +187,18 @@ class RabbitServiceConfigurer {
             }
         }
 
+        /*
+         * If the service class has an errorHandler method which accepts a throwable,
+         * we'll call it when a message generates an exception.  Please note, this
+         * exception will be thrown on every retry.
+         */
+        boolean hasBuiltInErrorHandler = (serviceGrailsClass.metaClass.respondsTo(serviceGrailsClass, 'handleError', Throwable))
+        if(hasBuiltInErrorHandler){
+            beanBuilder."${propertyName}${MESSAGE_ERROR_HANDLER_SUFFIX}"(PipedErrorHandler){
+                child = ref(propertyName)
+            }
+        }
+        
         // Next, define the listener container, i.e. the object that receives the
         // messages and passes them on to the listener.
         def listenerClass = type == SUBSCRIBE ? AutoQueueMessageListenerContainer : SimpleMessageListenerContainer
@@ -195,9 +208,15 @@ class RabbitServiceConfigurer {
             // the bug is fixed, this workaround may break things!
             acknowledgeMode = isServiceTransactional() ? AcknowledgeMode.AUTO : AcknowledgeMode.NONE
 
-            // Exceptions from listeners don't seem to be logged by Spring AMQP -
-            // not very useful! This simple error handler just performs the logging.
-            errorHandler = ref("rabbitErrorHandler")
+            if(hasBuiltInErrorHandler){
+                errorHandler = ref("${propertyName}${MESSAGE_ERROR_HANDLER_SUFFIX}")
+            }else{
+                if(!rabbitConfig.disableDefaultRabbitErrorHandler){
+                    // Exceptions from listeners don't seem to be logged by Spring AMQP -
+                    // not very useful! This simple error handler just performs the logging.
+                    errorHandler = ref("rabbitErrorHandler")
+                }
+            }
 
             // We manually start the listener later, once we know the service is
             // ready to process messages.
