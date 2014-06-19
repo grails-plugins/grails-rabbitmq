@@ -27,11 +27,29 @@ grails.project.dependency.resolution = {
         }
 
         runtime "org.springframework.retry:spring-retry:1.0.3.RELEASE"
+		
     }
 
     plugins {
         build ":release:2.0.4", {
             export = false
         }
+		
+		provided(":codenarc:0.20"){
+			exclude "junit"
+		}
     }
 }
+
+codenarc.ruleSetFiles="file:grails-app/conf/CodeNarcRules.groovy"
+codenarc.processTestUnit=false
+codenarc.processTestIntegration=false
+codenarc.reports = {
+	xmlReport('xml') {
+		outputFile = 'target/CodeNarc-Report.xml'
+	}
+	htmlReport('html') {
+		outputFile = 'target/CodeNarc-Report.html'
+	}
+}
+
