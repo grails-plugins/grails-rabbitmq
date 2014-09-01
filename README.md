@@ -1,5 +1,5 @@
 
-[![Build Status](https://secure.travis-ci.org/yeIIowsnow/grails-rabbitmq.png?branch=master)](http://travis-ci.org/yeIIowsnow/grails-rabbitmq)
+[![Build Status](https://travis-ci.org/yellowsnow/grails-rabbitmq.svg?branch=master)](http://travis-ci.org/yeIIowsnow/grails-rabbitmq)
 
 
 grails-rabbitmq
