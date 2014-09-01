@@ -2,10 +2,10 @@ language: java
  
 jdk:
 - oraclejdk7
-- oraclejdk8
  
 env:
-- GRAILS_VERSION=2.4.3 UPGRADE="set-grails-version $GRAILS_VERSION"
+# Grails 2.4.3 Not working yet (https://travis-ci.org/yellowsnow/grails-rabbitmq/jobs/34139712)
+#- GRAILS_VERSION=2.4.3 UPGRADE="set-grails-version $GRAILS_VERSION"
 - GRAILS_VERSION=2.3.11 UPGRADE=upgrade
 - GRAILS_VERSION=2.1.5 UPGRADE=upgrade
 - GRAILS_VERSION=2.0.4 UPGRADE=upgrade
