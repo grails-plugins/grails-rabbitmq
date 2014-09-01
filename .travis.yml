@@ -18,6 +18,7 @@ before_install:
 - echo "gvm_auto_answer=true" > ~/.gvm/etc/config
 - source ~/.gvm/bin/gvm-init.sh
 - gvm install grails $GRAILS_VERSION || true
+- chmod 775 ./build.sh
  
 branches:
 only:
