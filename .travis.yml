@@ -23,4 +23,4 @@ branches:
 only:
 - master
  
-script: grails clean && grails $UPGRADE --non-interactive && grails test-app --non-interactive --stacktrace
+script: grails clean && grails $UPGRADE --non-interactive && grails test-app unit: --non-interactive --stacktrace
