@@ -3,6 +3,7 @@ package org.grails.rabbitmq
 import org.springframework.amqp.core.Address
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessagePostProcessor
+import org.springframework.amqp.core.MessageProperties
 
 /**
  * Class for applying the dynamic rabbitSend() and rabbitRpcSend() methods to
@@ -12,6 +13,7 @@ class RabbitDynamicMethods {
     
     static void applyAllMethods(target, ctx) {
         applyRabbitSend(target, ctx)
+        applyRabbitSendByteArray(target, ctx)
 //        applyRabbitRpcSend(target, ctx)
     }
     
@@ -23,6 +25,15 @@ class RabbitDynamicMethods {
             // checks for String, we do the conversion manually.
             args = processArgs(args)
             ctx.rabbitTemplate.convertAndSend(*args)
+        }
+    }
+
+    static void applyRabbitSendByteArray(target, ctx) {
+        target.metaClass.rabbitSendByteArray = { Object[] args ->
+            String routingKey = args[0]
+            MessageProperties messageProperties = new MessageProperties()
+            Message message = new Message(args[1], messageProperties)
+            ctx.rabbitTemplate.send(routingKey, message)
         }
     }
 
