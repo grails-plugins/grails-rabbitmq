@@ -1,14 +1,7 @@
-language: java
+language: groovy
  
 jdk:
 - oraclejdk7
- 
-env:
-# Grails 2.4.3 Not working yet (https://travis-ci.org/yellowsnow/grails-rabbitmq/jobs/34139712)
-#- GRAILS_VERSION=2.4.3 UPGRADE="set-grails-version $GRAILS_VERSION"
-- GRAILS_VERSION=2.3.11 UPGRADE=upgrade
-- GRAILS_VERSION=2.1.5 UPGRADE=upgrade
-- GRAILS_VERSION=2.0.4 UPGRADE=upgrade
  
 before_install:
 - rm -rf ~/.gvm
@@ -18,10 +11,20 @@ before_install:
 - echo "gvm_auto_answer=true" > ~/.gvm/etc/config
 - source ~/.gvm/bin/gvm-init.sh
 - gvm install grails $GRAILS_VERSION || true
-- chmod 775 ./build.sh
+- chmod 775 ./travis-build.sh
  
 branches:
 only:
 - master
- 
-script: ./build.sh
+
+before_script:
+- rm -rf target
+
+script: ./travis-build.sh
+
+env:
+GRAILS_VERSION=3.0.2
+  global:
+  - GIT_NAME="Puneet Behl"
+  - GIT_EMAIL="puneetbehl@yahoo.com"
+  - secure: xSyvtgQRAlAJjhzXkXg3ObPoW7n3yGleV7dMqOT1XzYBVqcVKf+RZJvxW9Hb3zjk/M1Ga3mqVNsxHGU0Iwbpau84qIhAXoIj87GSMMhTgPGrVKiNfWK2BRvV73rNwJV1b/p+W6jxvrmXuTwOouz/NCwTjUsIyr8L6M4lDdCt4rg2IlKW2wD86Zbk76+HEpg1GVZDC9aHj708kSYrx9MDGyV+VqsWV/DgdbhvPgGxt5bo5I38LMzl0aVKRoCjmSWC0RMBI7hRSXesdZcmAgpNmOdbmiM/ptrKNsewPwpJw8wKNKjjYOR6k6kpcvykSPIKcDdo3tLs4LbK1TQLmWujAS7BXlqJovZdyvXb65zuo3yXVyrcV3Jb9Vd9+ND38lSB9TSQuiYO78iDNj2aYdmsiA35yfoHgNL5pH5l8kdbJb47lgss3necjXycbAFCKFrarwCdSIxQS/AM+cpUroy9KK/fvvMDyVR2CXYgQk71XIY1Qw+yRc/1HeRIlxLTEQyFyI2AVkRPV+XiJbvmVyUkPpYzvb2V6Uq7gatf5Z/k/oM5NjUzLPyIIqmZl9XOP27HqRRIZp3LyXdOkelfKuLmFoiUyEhftoKjshTQaqVvZM6Q35woDtYvaQ0bqy+F7cMJPSKrhGBT8sQ2Rak0VaXCV2ki9ezwJVXTVeWHQUrimAs=
