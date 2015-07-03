@@ -9,7 +9,6 @@ build/
 *.log
 
 # Libraries and others
-*.jar
 *.zip
 
 # Target
