@@ -1,7 +1,9 @@
 package grails.plugins.rabbitmq
 
+import grails.core.GrailsApplication
 import grails.plugins.Plugin
 import org.grails.core.artefact.ServiceArtefactHandler
+import org.springframework.context.ApplicationContext
 
 import static org.springframework.amqp.core.Binding.DestinationType.QUEUE
 
@@ -58,7 +60,7 @@ class RabbitmqGrailsPlugin extends Plugin {
 
     Closure doWithSpring() {{ ->
 
-        def application = grailsApplication
+        GrailsApplication application = grailsApplication
         def rabbitmqConfig = application.config.rabbitmq
         def configHolder = new RabbitConfigurationHolder(rabbitmqConfig)
 
@@ -79,8 +81,7 @@ class RabbitmqGrailsPlugin extends Plugin {
 
             log.debug "Connecting to rabbitmq ${connectionFactoryUsername}@${connectionFactoryHostname} with ${configHolder.getDefaultConcurrentConsumers()} consumers."
 
-            def connectionFactoryClassName = connectionFactoryConfig?.className ?:
-                    'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
+            def connectionFactoryClassName = connectionFactoryConfig?.className ?: 'org.springframework.amqp.rabbit.connection.CachingConnectionFactory'
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
             def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
@@ -205,8 +206,8 @@ class RabbitmqGrailsPlugin extends Plugin {
     } }
 
     void doWithDynamicMethods(){
-        def application = grailsApplication
-        def appCtx = applicationContext
+        GrailsApplication application = grailsApplication
+        ApplicationContext appCtx = applicationContext
         addDynamicMessageSendingMethods application.allClasses, appCtx
     }
 
@@ -234,7 +235,7 @@ class RabbitmqGrailsPlugin extends Plugin {
     }
 
     void onChange(Map<String, Object> event) {
-        def application = grailsApplication
+        GrailsApplication application = grailsApplication
         Map<String, Object> evt = event
         if(evt.source instanceof Class) {
             addDynamicMessageSendingMethods ([evt.source], evt.ctx)

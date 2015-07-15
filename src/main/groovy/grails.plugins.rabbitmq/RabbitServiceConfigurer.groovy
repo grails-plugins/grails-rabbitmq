@@ -15,10 +15,10 @@
  */
 package grails.plugins.rabbitmq
 
+import grails.util.GrailsClassUtils as GCU
 import org.slf4j.LoggerFactory
-
-import org.codehaus.groovy.grails.commons.GrailsClassUtils as GCU
 import org.springframework.amqp.core.AcknowledgeMode
+
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 

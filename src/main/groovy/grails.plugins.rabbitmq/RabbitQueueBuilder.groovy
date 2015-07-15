@@ -7,21 +7,21 @@ class RabbitQueueBuilder {
 
     private final static log = LoggerFactory.getLogger(RabbitQueueBuilder)
     
-    def bindings = []
-    def exchanges = []
-    def queues = []
+    List bindings = []
+    List exchanges = []
+    List queues = []
 
     private currentExchange
     
     def methodMissing(String methodName, args) {
-        def queue
+        Queue queue
 
         def argsMap = args ? args[0] : [:]
         if(argsMap) {
-            def autoDelete = Boolean.valueOf(argsMap.autoDelete)
-            def exclusive = Boolean.valueOf(argsMap.exclusive)
-            def durable = Boolean.valueOf(argsMap.durable)
-            def arguments
+            Boolean autoDelete = Boolean.valueOf(argsMap.autoDelete)
+            Boolean exclusive = Boolean.valueOf(argsMap.exclusive)
+            Boolean durable = Boolean.valueOf(argsMap.durable)
+            Map arguments
             if(argsMap.arguments instanceof Map) {
                 arguments = argsMap.arguments
             }
