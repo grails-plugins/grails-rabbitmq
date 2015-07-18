@@ -10,13 +10,14 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
 import org.springframework.amqp.rabbit.connection.Connection
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.context.ApplicationContext
 import spock.lang.Shared
 import spock.lang.Specification
 
 class AutoQueueMessageListenerContainerSpec extends Specification {
-    @Shared def mockContext
-    @Shared def mockAdminBean
-    @Shared AutoQueueMessageListenerContainer testContainer
+    @Shared ApplicationContext mockContext = new MockApplicationContext()
+    @Shared def mockAdminBean = new Expando()
+    @Shared AutoQueueMessageListenerContainer testContainer = new AutoQueueMessageListenerContainer()
 
     void setupSpec() {
         mockContext = new MockApplicationContext()

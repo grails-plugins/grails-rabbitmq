@@ -1,5 +1,6 @@
 package grails.plugins.rabbitmq
 
+import grails.core.GrailsApplication
 import grails.spring.BeanBuilder
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
@@ -16,7 +17,7 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 class RabbitGrailsPluginSpec extends Specification {
 
-    def createPluginFileInstance(application=[:]) {
+    def createPluginFileInstance(application = [:]) {
         def pluginClass = Class.forName('grails.plugins.rabbitmq.RabbitmqGrailsPlugin')
         def pluginInstance = pluginClass.newInstance()
         pluginInstance.metaClass.grailsApplication = application
@@ -26,12 +27,12 @@ class RabbitGrailsPluginSpec extends Specification {
     void testQueueAndExchangeSetup() {
         when:
         // mock up test configuration
-        def application = new Object()
+        GrailsApplication application = grailsApplication
 
         application.metaClass.getServiceClasses = {
             return []
         }
-        application.metaClass.config =  new ConfigSlurper().parse("""
+        application.config = new ConfigSlurper().parse("""
             rabbitmq {
                 connectionfactory {
                     username = 'guest'
@@ -66,7 +67,7 @@ class RabbitGrailsPluginSpec extends Specification {
         def itQ1 = ctx.getBean("grails.rabbit.queue.it_q1")
 
         then:
-        itQ1.getClass() ==  Queue.class
+        itQ1.getClass() == Queue.class
         itQ1.name == "it_q1"
         itQ1.durable == true
         itQ1.autoDelete == false
@@ -77,10 +78,10 @@ class RabbitGrailsPluginSpec extends Specification {
         def ibBind = ctx.getBean("grails.rabbit.binding.it_topic.it_q1")
 
         then:
-        ibBind.getClass() ==  Binding.class
+        ibBind.getClass() == Binding.class
         ibBind.destination == 'it_q1'
         ibBind.exchange == 'it_topic'
-        ibBind.routingKey ==  '#'
+        ibBind.routingKey == '#'
         ibBind.destinationType == DestinationType.QUEUE
     }
 
@@ -91,13 +92,10 @@ class RabbitGrailsPluginSpec extends Specification {
         def mockRedService = new MockSubscribeService(propertyName: 'redService')
         def mockTealService = new MockSubscribeService(propertyName: 'tealService')
 
-        def application = new Object()
-        
-        application.metaClass.getServiceClasses = {
-            return [mockBlueService, mockRedService, mockPinkService, mockTealService]
-        }
+        GrailsApplication application = grailsApplication
+        application.metaClass.getServiceClasses = { -> [mockBlueService, mockRedService, mockPinkService, mockTealService] }
 
-        application.metaClass.config = new ConfigSlurper().parse("""
+        application.config = new ConfigSlurper().parse("""
             rabbitmq {
                 connectionfactory {
                     username = 'guest'
@@ -131,7 +129,7 @@ class RabbitGrailsPluginSpec extends Specification {
                 propertyName = 'tealService'
             }
         }
-        bb.beans base.doWithSpring()
+        bb.beans(base.doWithSpring())
         def ctx = bb.createApplicationContext()
 
         then:
@@ -154,7 +152,7 @@ class RabbitGrailsPluginSpec extends Specification {
         def redService1 = new MockSubscribeService(propertyName: 'redService')
         def redService2 = new MockSubscribeService(propertyName: 'redService')
 
-        def application = new Object()
+        GrailsApplication application = grailsApplication
         application.metaClass.getServiceClasses = {
             return [blueService1, blueService2]
         }
@@ -170,7 +168,7 @@ class RabbitGrailsPluginSpec extends Specification {
         """)
 
         RabbitmqGrailsPlugin queueServices = createPluginFileInstance(application)
-        def msg = shouldFail(IllegalArgumentException){
+        def msg = shouldFail(IllegalArgumentException) {
             new BeanBuilder().beans queueServices.doWithSpring()
         }
 
@@ -183,14 +181,13 @@ class RabbitGrailsPluginSpec extends Specification {
         }
 
         RabbitmqGrailsPlugin subscribeServices = createPluginFileInstance(application)
-        msg = shouldFail(IllegalArgumentException){
+        msg = shouldFail(IllegalArgumentException) {
             new BeanBuilder().beans subscribeServices.doWithSpring()
         }
 
         then:
         msg.contains('redService')
     }
-
 }
 
 class MockSubscribeService {
