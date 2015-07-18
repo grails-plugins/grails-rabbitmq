@@ -41,16 +41,14 @@ class AutoQueueMessageListenerContainer extends SimpleMessageListenerContainer i
         }
 
         // First, create a broker-named, temporary queue.
-        //TODO: find out why using applicationContext is not working as compared to getApplicationContext()
-        def adminBean = getApplicationContext().getBean(rabbitAdminBeanName)
+        def adminBean = applicationContext.getBean(rabbitAdminBeanName)
         def queue = adminBean.declareQueue()
 
         // Now bind this queue to the named exchanged. If the exchange is a
         // fanout, then we don't bind with a routing key. If it's a topic,
         // we use the 'match-all' wildcard. Other exchange types are not
         // supported.
-        //TODO: find out why using applicationContext is not working as compared to getApplicationContext()
-        def exchange = getApplicationContext().getBean(exchangeBeanName)
+        def exchange = applicationContext.getBean(exchangeBeanName)
 
         def binding = null
         if (exchange instanceof FanoutExchange) {
