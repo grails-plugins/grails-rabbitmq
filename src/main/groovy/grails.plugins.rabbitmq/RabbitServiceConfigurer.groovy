@@ -201,7 +201,7 @@ class RabbitServiceConfigurer {
             // ready to process messages.
             autoStartup = false
             channelTransacted = isServiceTransactional()
-            connectionFactory = ref("rabbitMQConnectionFactory")
+            connectionFactory = ref("rabbitConnectionFactory")
             concurrentConsumers = serviceConcurrentConsumers
             messageListener = ref("${propertyName}RabbitAdapter")
             for (entry in containerOptions) {

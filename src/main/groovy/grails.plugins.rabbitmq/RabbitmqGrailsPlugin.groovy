@@ -85,7 +85,7 @@ class RabbitmqGrailsPlugin extends Plugin {
             def parentClassLoader = getClass().classLoader
             def loader = new GroovyClassLoader(parentClassLoader)
             def connectionFactoryClass = loader.loadClass(connectionFactoryClassName)
-            rabbitMQConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
+            rabbitConnectionFactory(connectionFactoryClass, connectionFactoryHostname) {
                 username = connectionFactoryUsername
                 password = connectionFactoryPassword
                 channelCacheSize = connectionChannelCacheSize
@@ -99,7 +99,7 @@ class RabbitmqGrailsPlugin extends Plugin {
                 }
             }
             rabbitTemplate(RabbitTemplate) {
-                connectionFactory = rabbitMQConnectionFactory
+                connectionFactory = rabbitConnectionFactory
                 if (messageConverterBean) {
                      messageConverter = ref(messageConverterBean)
                  } else {
@@ -108,7 +108,7 @@ class RabbitmqGrailsPlugin extends Plugin {
                      messageConverter = converter
                  }
             }
-            adm(RabbitAdmin, rabbitMQConnectionFactory)
+            adm(RabbitAdmin, rabbitConnectionFactory)
             rabbitErrorHandler(RabbitErrorHandler)
 
             // Add beans to hook up services as AMQP listeners.
@@ -212,7 +212,7 @@ class RabbitmqGrailsPlugin extends Plugin {
     }
 
     private addDynamicMessageSendingMethods(classes, ctx) {
-        if(ctx.rabbitMQConnectionFactory) {
+        if(ctx.rabbitConnectionFactory) {
             classes.each { clz ->
                 RabbitDynamicMethods.applyAllMethods(clz, ctx)
             }
