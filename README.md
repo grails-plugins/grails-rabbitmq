@@ -6,3 +6,5 @@ grails-rabbitmq
 ===============
 
 Grails RabbitMQ Plugin
+
+[Sample Applicatoin](https://github.com/puneetbehl/rabbitmqDemo.git)
