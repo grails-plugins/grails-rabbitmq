@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 rm -rf *.zip
-./gradlew clean test jar
+./gradlew clean check jar
 
 
 #EXIT_STATUS=0
