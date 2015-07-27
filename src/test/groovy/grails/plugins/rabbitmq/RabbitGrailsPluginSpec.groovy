@@ -153,7 +153,7 @@ class RabbitGrailsPluginSpec extends Specification {
         def redService2 = new MockSubscribeService(propertyName: 'redService')
 
         GrailsApplication application = grailsApplication
-        application.metaClass.getServiceClasses = {
+        application.metaClass.getServiceClasses =  {
             return [blueService1, blueService2]
         }
 

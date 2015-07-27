@@ -113,7 +113,7 @@ class RabbitmqGrailsPlugin extends Plugin {
 
             // Add beans to hook up services as AMQP listeners.
             Set registeredServices = new HashSet()
-            for(service in application.serviceClasses) {
+            for(service in application.getServiceClasses()) {
                 def serviceConfigurer = new RabbitServiceConfigurer(service, rabbitmqConfig)
                 if(!serviceConfigurer.isListener() || !configHolder.isServiceEnabled(service)) continue
 
@@ -208,7 +208,7 @@ class RabbitmqGrailsPlugin extends Plugin {
     void doWithDynamicMethods(){
         GrailsApplication application = grailsApplication
         ApplicationContext appCtx = applicationContext
-        addDynamicMessageSendingMethods application.allClasses, appCtx
+        addDynamicMessageSendingMethods application.getAllClasses(), appCtx
     }
 
     private addDynamicMessageSendingMethods(classes, ctx) {
