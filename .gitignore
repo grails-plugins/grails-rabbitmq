@@ -1,9 +1,27 @@
-*.swp
-target-eclipse/
-.settings/
-stacktrace.log
-plugin.xml
-grails-rabbitmq-*.zip*
-target
-web-app/WEB-INF/classes/
+# JetBrains IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+.gradle
+build/
 
+# Log files
+*.log
+
+# Libraries and others
+*.zip
+
+# Target
+target/
+target-eclipse/
+
+.DS_Store
+
+docs/
+plugin.xml
+.settings
+
+# Unused grails files
+.classpath
+.project
+test/reports
